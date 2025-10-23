@@ -10,7 +10,7 @@
 body {
     font-family: 'Arial', sans-serif;
 
-    /* ★背景設定: background.svg のパスを修正 */
+    /* ★背景設定: assets/background.svg のパスを適用 */
     background-image: url('assets/background.svg');
     background-size: cover;
     background-repeat: no-repeat;
@@ -35,17 +35,21 @@ body {
     padding-bottom: 50px;
 }
 
-/* アマテラス画像の初期設定 */
+/* ★アマテラス画像の初期設定（JSが位置を制御するための最小限のCSS）★ */
 .amaterasu {
     width: 120px;
     height: auto;
+    /* SVGの縦横比を維持 */
     position: absolute;
     bottom: 20px;
+    /* Y軸の初期基準（JSで計算） */
     left: 0;
+    /* X軸の初期基準（JSで計算）*/
 
-    /* ★追加: 背景色を強制的に透明にする★ */
+    /* ★SVGの透過対策: 背景色を強制的に透明に */
     background-color: transparent;
 
+    /* JSからのtransformを受け入れるための設定 */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
 }
@@ -55,33 +59,44 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    /* ボタン間の間隔 */
     margin-top: 150px;
     padding: 20px 0;
 }
 
+/* ★鳥居リンク（<a>タグ）のスタイル: 枠と背景を削除し、画像自体をクリック可能にする★ */
 .torii-link {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     text-decoration: none;
-    background-color: #ffffff;
-    border: 3px solid var(--main-red);
-    border-radius: 10px;
-    padding: 10px 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s, transform 0.2s;
+
+    /* ボタンの装飾をすべて削除 */
+    background-color: transparent;
+    border: none;
+    padding: 5px 0;
+    /* パディングを最小限に */
+    box-shadow: none;
+
+    transition: transform 0.2s;
     position: relative;
     overflow: hidden;
 }
 
 .torii-link:hover {
-    background-color: #ffeaea;
+    /* ホバー時に少し浮き上がらせる効果は維持 */
     transform: translateY(-2px);
+    background-color: transparent;
 }
 
+/* 鳥居画像（<img>タグ）のスタイル */
 .torii-img {
-    width: 40px;
+    width: 60px;
+    /* 画像を少し大きくし、クリックしやすくする */
     height: auto;
     margin-right: 15px;
+    background-color: transparent;
+    /* SVGの透過対策 */
 }
 
 .platform-name {

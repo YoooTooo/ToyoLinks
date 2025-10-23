@@ -38,13 +38,17 @@ body {
 /* アマテラス画像の初期設定 */
 .amaterasu {
     width: 120px;
-    height: 180px;
+    height: auto;
+    /* ★180px から auto に戻す！ */
     position: absolute;
     bottom: 20px;
     left: 50%;
+    /* transformをCSSで定義する際は、translateX(-50%)のみにする */
     transform: translateX(-50%);
+    /* transitionは残す */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
+    /* margin-left など、他の位置調整のCSSがないことを確認 */
 }
 
 /* リンクエリアのレイアウト */

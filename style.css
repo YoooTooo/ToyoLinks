@@ -4,14 +4,19 @@
     /* 鳥居の色 */
     --accent-gold: #ffcc00;
     /* アクセントカラー */
-    --bg-color: #f0f0e8;
-    /* わずかにクリームがかった背景 */
     --text-color: #333333;
 }
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: var(--bg-color);
+
+    /* ★背景設定: background.svg を適用 */
+    background-image: url('background.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+
     margin: 0;
     padding: 20px;
     display: flex;
@@ -27,20 +32,26 @@ body {
     /* スマホサイズを意識 */
     text-align: center;
     position: relative;
+    /* 背景画像が透けるように、背景色を透明か半透明にする場合はここで設定 */
+    /* background-color: rgba(255, 255, 255, 0.85); */
+    padding-bottom: 50px;
+    /* アマテラスが一番下に来た時のための余白 */
 }
 
 /* アマテラス画像の初期設定 */
 .amaterasu {
     width: 120px;
-    /* サイズは画像に合わせて調整してください */
-    height: auto;
+    /* ★JSの amaterasuWidth と一致 */
+    height: 180px;
+    /* ★JSの amaterasuHeight と一致 */
     position: absolute;
     bottom: 20px;
-    /* リンクエリアの上部に配置 */
+    /* ★JSの INITIAL_BOTTOM_OFFSET と一致 */
     left: 50%;
+    /* 初期位置を中央に設定 */
     transform: translateX(-50%);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-    /* アニメーション設定 */
+    /* 移動・消えるアニメーション時間の設定 */
+    transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
 }
 
@@ -51,7 +62,6 @@ body {
     gap: 15px;
     /* ボタン間の間隔 */
     margin-top: 150px;
-    /* アマテラス画像の高さ分空ける */
     padding: 20px 0;
 }
 
@@ -67,7 +77,6 @@ body {
     transition: background-color 0.2s, transform 0.2s;
     position: relative;
     overflow: hidden;
-    /* アマテラスが動いたときに外にはみ出さないように */
 }
 
 .torii-link:hover {
@@ -77,7 +86,6 @@ body {
 
 .torii-img {
     width: 40px;
-    /* 鳥居アイコンのサイズ */
     height: auto;
     margin-right: 15px;
 }
@@ -94,20 +102,4 @@ body {
     color: var(--main-red);
     font-size: 1.1em;
     font-weight: bold;
-}
-
-/* style.css のアマテラス (.amaterasu) 部分 */
-.amaterasu {
-    width: 120px;
-    height: 180px;
-    /* ★必須 */
-    position: absolute;
-    bottom: 20px;
-    /* ★Y方向の基準 */
-    left: 50%;
-    transform: translateX(-50%);
-    /* ★X方向の初期基準 */
-    transition: opacity 0.5s ease-out, transform 0.4s ease-out;
-    z-index: 10;
-    /* margin-left, margin-bottom など、他の位置調整のCSSがないか確認してください */
 }

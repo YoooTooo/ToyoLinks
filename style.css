@@ -100,11 +100,14 @@ body {
 .amaterasu {
     width: 120px;
     height: 180px;
-    /* ★高さを追加・修正 */
+    /* ★必須 */
     position: absolute;
     bottom: 20px;
+    /* ★Y方向の基準 */
     left: 50%;
     transform: translateX(-50%);
+    /* ★X方向の初期基準 */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
+    /* margin-left, margin-bottom など、他の位置調整のCSSがないか確認してください */
 }

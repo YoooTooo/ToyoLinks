@@ -3,64 +3,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('.portal-container');
     const links = document.querySelectorAll('.torii-link');
 
+    // 画像情報に基づき、CSSのwidth/heightと一致させる
     const amaterasuWidth = 120;
-    const amaterasuHeight = 180; // ★SVGの高さに合わせて調整してください（例として120px）
+    const amaterasuHeight = 180;
 
-    const moveDuration = 400; // 移動アニメーションの時間 (ms)
-    const fadeDuration = 500; // 消えて遷移するまでの待機時間 (ms)
-
-    // 初期位置の基準値
+    const moveDuration = 400;
+    const fadeDuration = 500;
     const INITIAL_TRANSFORM_X = -50;
-    // ★CSSの bottom: 20px からの移動を計算するため、初期のY位置（下からのオフセット）を把握しておく
     const INITIAL_BOTTOM_OFFSET = 20;
 
-    // --- アマテラスを移動させるコア関数 ---
-    // targetPixelOffset は X方向のピクセル移動量
-    // targetY は、クリック位置のY座標（ページ上端から）
-    function moveAmaterasu(targetPixelOffset, targetY = null) {
-        amaterasu.style.transition = `transform ${moveDuration}ms ease-in-out`;
+    // アマテラスにtransformを適用するコア関数
+    function applyTransform(xOffset, yOffset) {
+        // CSSの初期位置 (-50%) と、計算したピクセル値を結合
+        const transformValue = `translateX(calc(${INITIAL_TRANSFORM_X}%) translateX(${xOffset}px)) translateY(${yOffset}px)`;
 
-        let transformY_px = 0; // Y方向のピクセル移動量
-
-        if (targetY !== null) {
-            // Y方向の移動量を計算
-            const containerRect = container.getBoundingClientRect();
-
-            // 1. コンテナの底辺からクリック位置までの距離 (Y軸は下向きが正)
-            const bottomOfContainer = containerRect.top + containerRect.height;
-            const distance_from_bottom = bottomOfContainer - targetY;
-
-            // 2. アマテラスの初期位置のY座標を考慮 (bottom: 20px)
-            // アマテラスの中心がクリック位置に来るように計算
-            const y_offset_from_bottom = distance_from_bottom - INITIAL_BOTTOM_OFFSET - (amaterasuHeight / 2);
-
-            // Y軸はCSSのtransformでは「上方向がマイナス」なので、この値を使います
-            transformY_px = -y_offset_from_bottom;
-        } else {
-            // リンククリック時は、現在のY位置を維持
-            // X方向のみの移動。ここでは便宜上0として、CSSの bottom: 20px を維持する
-            transformY_px = 0;
-        }
-
-        // CSSの初期位置 (translateX(-50%)) に、計算したピクセル値を加算
-        amaterasu.style.transform = `translateX(calc(${INITIAL_TRANSFORM_X}%) translateX(${targetPixelOffset}px)) translateY(${transformY_px}px)`;
+        console.log("Applying Transform:", transformValue); // ★デバッグ用: 適用値をコンソールに出力
+        amaterasu.style.transform = transformValue;
     }
 
     // --- 画面全体のクリックイベント ---
     container.addEventListener('click', (e) => {
-        // e.target.closest() がリンク要素を返さない場合に実行
         if (!e.target.closest('.torii-link')) {
             const clickX = e.clientX;
-            const clickY = e.clientY; // ★Y座標を取得！
+            const clickY = e.clientY;
 
             const containerRect = container.getBoundingClientRect();
 
-            // X方向の移動量計算 (前回動作した計算)
+            // 1. X方向の移動量計算
             const relativeClickX = clickX - containerRect.left;
-            const centerOffset = relativeClickX - (containerRect.width / 2);
+            const centerOffset = relativeClickX - (containerRect.width / 2); // X方向のピクセル移動量
+
+            // 2. Y方向の移動量計算
+            const bottomOfContainer = containerRect.top + containerRect.height;
+            const distance_from_bottom = bottomOfContainer - clickY;
+            const y_offset_from_bottom = distance_from_bottom - INITIAL_BOTTOM_OFFSET - (amaterasuHeight / 2);
+            const transformY_px = -y_offset_from_bottom; // 上方向がマイナス
+
+            console.log(`Click: (${clickX}, ${clickY}), OffsetX: ${centerOffset.toFixed(2)}, OffsetY: ${transformY_px.toFixed(2)}`); // ★デバッグ用
 
             // アマテラスを移動
-            moveAmaterasu(centerOffset, clickY); // ★Y座標を渡す
+            applyTransform(centerOffset, transformY_px);
         }
     });
 
@@ -70,16 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const targetUrl = link.href;
 
+            // X方向の移動量計算 (鳥居の中心へ)
             const linkRect = link.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
-
-            // X方向の移動量計算 (前回動作した計算)
             const linkCenterOffset = (linkRect.left + linkRect.width / 2) - (containerRect.left + containerRect.width / 2);
 
+            // リンククリック時は、Y方向の引数は0（CSSの bottom: 20px を維持）
+            const y_pos_link_click = 0;
+
             // 1. 移動アニメーション実行
-            // リンククリック時は、Y方向の引数（targetY）を null のままにして、
-            // CSSの bottom: 20px の初期Y位置を維持
-            moveAmaterasu(linkCenterOffset, null);
+            applyTransform(linkCenterOffset, y_pos_link_click);
 
             // 2. 移動完了後に消えるアニメーション（神隠し）
             setTimeout(() => {
@@ -87,7 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 amaterasu.style.opacity = '0';
 
                 // 消えるときも最後の位置を維持しつつ、上にフワッと移動
-                amaterasu.style.transform = `translateX(calc(${INITIAL_TRANSFORM_X}%) translateX(${linkCenterOffset}px)) translateY(-30px)`;
+                const final_fade_transform = `translateX(calc(${INITIAL_TRANSFORM_X}%) translateX(${linkCenterOffset}px)) translateY(-30px)`;
+                amaterasu.style.transform = final_fade_transform;
 
                 // 3. 完全に消えた後にページを遷移
                 setTimeout(() => {

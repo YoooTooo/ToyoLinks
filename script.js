@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const transformValue = `translateX(${xOffset}px) translateY(${yOffset}px)`;
 
         console.log(`Applying Transform: X=${xOffset.toFixed(2)}px, Y=${yOffset.toFixed(2)}px`);
-
+        console.log(`transformValue: ${transformValue}`);
         amaterasu.style.transition = `transform ${moveDuration}ms ease-in-out`;
         amaterasu.style.transform = transformValue;
     }

@@ -10,8 +10,8 @@
 body {
     font-family: 'Arial', sans-serif;
 
-    /* ★背景設定: background.svg を適用 */
-    background-image: url('background.svg');
+    /* ★背景設定: background.svg のパスを修正 */
+    background-image: url('assets/background.svg');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -32,25 +32,17 @@ body {
     /* スマホサイズを意識 */
     text-align: center;
     position: relative;
-    /* 背景画像が透けるように、背景色を透明か半透明にする場合はここで設定 */
-    /* background-color: rgba(255, 255, 255, 0.85); */
     padding-bottom: 50px;
-    /* アマテラスが一番下に来た時のための余白 */
 }
 
 /* アマテラス画像の初期設定 */
 .amaterasu {
     width: 120px;
-    /* ★JSの amaterasuWidth と一致 */
     height: 180px;
-    /* ★JSの amaterasuHeight と一致 */
     position: absolute;
     bottom: 20px;
-    /* ★JSの INITIAL_BOTTOM_OFFSET と一致 */
     left: 50%;
-    /* 初期位置を中央に設定 */
     transform: translateX(-50%);
-    /* 移動・消えるアニメーション時間の設定 */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
 }
@@ -60,7 +52,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    /* ボタン間の間隔 */
     margin-top: 150px;
     padding: 20px 0;
 }

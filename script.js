@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // スクリプトが読み込まれたか確認するためのデバッグログ
     console.log("Script loading attempt: Ready to run logic.");
     console.log("Script executed: DOMContentLoaded.");
 
@@ -9,22 +8,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // CSSと一致させる定数
     const amaterasuWidth = 120;
-    const amaterasuHeight = 180;
+    const amaterasuHeight = 180; // 計算用として維持
 
     // アニメーション時間
     const moveDuration = 400;
     const fadeDuration = 500;
 
-    // CSSの初期位置の基準値
-    const INITIAL_TRANSFORM_X = -50;
+    // CSSの初期位置の基準値（bottom: 20px は維持）
     const INITIAL_BOTTOM_OFFSET = 20;
 
     // アマテラスにtransformを適用するコア関数
     function applyTransform(xOffset, yOffset) {
-        // CSSの初期位置 (-50%) と、計算したピクセル値を結合
-        const transformValue = `translateX(calc(${INITIAL_TRANSFORM_X}%) translateX(${xOffset}px)) translateY(${yOffset}px)`;
+        // ★修正: CSSの translateX(-50%) が無くなったため、
+        // 左端 (left: 0) からの絶対ピクセル値として transform を適用
+        const transformValue = `translateX(${xOffset}px) translateY(${yOffset}px)`;
 
-        // デバッグ用: 適用されるtransform値を出力
         console.log(`Applying Transform: X=${xOffset.toFixed(2)}px, Y=${yOffset.toFixed(2)}px`);
 
         amaterasu.style.transition = `transform ${moveDuration}ms ease-in-out`;
@@ -33,27 +31,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 画面全体のクリックイベント ---
     container.addEventListener('click', (e) => {
-        // クリックした要素がリンク要素でない場合
         if (!e.target.closest('.torii-link')) {
-            const clickX = e.clientX;
-            const clickY = e.clientY;
+            const clickX = e.clientX; // ページ左端からのクリックX座標
+            const clickY = e.clientY; // ページ上端からのクリックY座標
 
             const containerRect = container.getBoundingClientRect();
 
-            // 1. X方向の移動量計算 (コンテナの中心からのピクセル差)
+            // 1. X方向の移動量計算
+            // left: 0 からの移動量 ＝ (クリックX - コンテナ左端) - (アマテラスの幅 / 2)
             const relativeClickX = clickX - containerRect.left;
-            const centerOffset = relativeClickX - (containerRect.width / 2);
+            const absoluteX_px = relativeClickX - (amaterasuWidth / 2); // アマテラスの中心をクリック位置に合わせる
 
-            // 2. Y方向の移動量計算（★足元に合わせるロジック）
+            // 2. Y方向の移動量計算（足元合わせロジックはそのまま）
             const bottomOfContainer = containerRect.top + containerRect.height;
             const distance_from_bottom = bottomOfContainer - clickY;
-
-            // アマテラスの足元を合わせるため、画像高さの半分 (amaterasuHeight / 2) の補正は不要
             const y_offset_from_bottom = distance_from_bottom - INITIAL_BOTTOM_OFFSET;
             const transformY_px = -y_offset_from_bottom; // 上方向がマイナス
 
             // アマテラスを移動
-            applyTransform(centerOffset, transformY_px);
+            applyTransform(absoluteX_px, transformY_px); // ★絶対X位置を適用
         }
     });
 
@@ -66,13 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // X方向の移動量計算 (鳥居の中心へ)
             const linkRect = link.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
-            const linkCenterOffset = (linkRect.left + linkRect.width / 2) - (containerRect.left + containerRect.width / 2);
+
+            // ★修正: left: 0 からの絶対ピクセル位置を計算
+            const linkCenterX = (linkRect.left + linkRect.width / 2) - containerRect.left;
+            const absoluteLinkX_px = linkCenterX - (amaterasuWidth / 2); // 鳥居の中心にアマテラスの中心を合わせる
 
             // リンククリック時は、Y方向の引数は0（CSSの bottom: 20px の初期Y位置を維持）
             const y_pos_link_click = 0;
 
             // 1. 移動アニメーション実行
-            applyTransform(linkCenterOffset, y_pos_link_click);
+            applyTransform(absoluteLinkX_px, y_pos_link_click);
 
             // 2. 移動完了後に消えるアニメーション（神隠し）
             setTimeout(() => {
@@ -80,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 amaterasu.style.opacity = '0';
 
                 // 消えるときも最後の位置を維持しつつ、上にフワッと移動
-                const final_fade_transform = `translateX(calc(${INITIAL_TRANSFORM_X}%) translateX(${linkCenterOffset}px)) translateY(-30px)`;
+                const final_fade_transform = `translateX(${absoluteLinkX_px}px) translateY(-30px)`;
                 amaterasu.style.transform = final_fade_transform;
 
                 // 3. 完全に消えた後にページを遷移
@@ -91,4 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }, moveDuration);
         });
     });
+
+    // ★ページロード時の初期位置設定（左中央から中央下へ移動）
+    // スクリプトロード後、一度だけ初期位置を設定してアマテラスを画面中央下に配置
+    const initialPositionX = (container.clientWidth / 2) - (amaterasuWidth / 2);
+    applyTransform(initialPositionX, 0); // Y=0 は bottom: 20px の初期位置を意味する
 });

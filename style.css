@@ -41,11 +41,10 @@ body {
     height: auto;
     position: absolute;
     bottom: 20px;
-    /* Y軸の初期基準（JSで計算） */
     left: 0;
-    /* ★50%から0に変更 */
 
-    /* ★transform: translateX(-50%); を完全に削除！★ */
+    /* ★追加: 背景色を強制的に透明にする★ */
+    background-color: transparent;
 
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;

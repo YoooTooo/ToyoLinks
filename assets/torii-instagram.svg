@@ -2,7 +2,7 @@
      x="0px" y="0px" width="100%" viewBox="0 0 600 600" 
      style="background-color: transparent;"
      xml:space="preserve">
-<path opacity="1.000000" stroke="none" 
+<path fill="#000000" opacity="1.000000" stroke="none" 
 	d="
 M324.000000,601.000000 
 	C216.000000,601.000000 108.500000,601.000000 1.000000,601.000000 

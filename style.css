@@ -99,15 +99,12 @@ body {
 /* style.css のアマテラス (.amaterasu) 部分 */
 .amaterasu {
     width: 120px;
-    /* ★JSの amaterasuWidth と一致 */
-    height: auto;
+    height: 180px;
+    /* ★高さを追加・修正 */
     position: absolute;
     bottom: 20px;
     left: 50%;
-    /* 初期位置を中央に設定。この -50% がアマテラスの中心を示します */
     transform: translateX(-50%);
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
-    /* アニメーション設定 */
     z-index: 10;
-    /* margin-left: -60px; は削除します */
 }

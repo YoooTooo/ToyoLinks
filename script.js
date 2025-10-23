@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const links = document.querySelectorAll('.torii-link');
 
     const amaterasuWidth = 120;
-    const amaterasuHeight = 120; // ★SVGの高さに合わせて調整してください（例として120px）
+    const amaterasuHeight = 180; // ★SVGの高さに合わせて調整してください（例として120px）
 
     const moveDuration = 400; // 移動アニメーションの時間 (ms)
     const fadeDuration = 500; // 消えて遷移するまでの待機時間 (ms)

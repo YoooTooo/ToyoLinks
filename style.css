@@ -35,21 +35,17 @@ body {
     padding-bottom: 50px;
 }
 
-/* ★アマテラス画像の初期設定（JSが位置を制御するための最小限のCSS）★ */
+/* アマテラス画像の初期設定（JSが位置を制御するための最小限のCSS） */
 .amaterasu {
     width: 120px;
     height: auto;
-    /* SVGの縦横比を維持 */
     position: absolute;
     bottom: 20px;
-    /* Y軸の初期基準（JSで計算） */
     left: 0;
-    /* X軸の初期基準（JSで計算）*/
 
-    /* ★SVGの透過対策: 背景色を強制的に透明に */
+    /* SVGの透過対策: 背景色を強制的に透明に */
     background-color: transparent;
 
-    /* JSからのtransformを受け入れるための設定 */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
 }
@@ -58,33 +54,36 @@ body {
 .link-area {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    /* ボタン間の間隔 */
+    /* 鳥居のサイズに合わせるため、間隔を調整 */
+    gap: 10px;
     margin-top: 150px;
+    /* リンク全体を中央に配置 */
+    align-items: center;
     padding: 20px 0;
 }
 
-/* ★鳥居リンク（<a>タグ）のスタイル: 枠と背景を削除し、画像自体をクリック可能にする★ */
+/* ★鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに合わせる★ */
 .torii-link {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    text-decoration: none;
+    display: block;
+    /* blockにして幅を設定可能にする */
+    width: 60px;
+    /* ★鳥居画像の幅に合わせる（クリック領域をアイコンサイズに限定） */
 
-    /* ボタンの装飾をすべて削除 */
+    text-decoration: none;
     background-color: transparent;
     border: none;
-    padding: 5px 0;
-    /* パディングを最小限に */
+    padding: 0;
+    /* パディングを削除 */
     box-shadow: none;
 
     transition: transform 0.2s;
     position: relative;
     overflow: hidden;
+    text-align: center;
+    /* 内部の画像も中央に */
 }
 
 .torii-link:hover {
-    /* ホバー時に少し浮き上がらせる効果は維持 */
     transform: translateY(-2px);
     background-color: transparent;
 }
@@ -92,19 +91,22 @@ body {
 /* 鳥居画像（<img>タグ）のスタイル */
 .torii-img {
     width: 60px;
-    /* 画像を少し大きくし、クリックしやすくする */
+    /* 画像サイズは60pxを維持 */
     height: auto;
-    margin-right: 15px;
+    /* 横の文字がないため、右マージンは不要 */
+    margin: 0;
     background-color: transparent;
-    /* SVGの透過対策 */
 }
 
+/* ★削除: platform-name のスタイルは不要（HTMLから<span>を削除するため）★ */
+/*
 .platform-name {
     font-weight: bold;
     color: var(--text-color);
     flex-grow: 1;
     text-align: left;
 }
+*/
 
 .caption {
     margin-top: 30px;

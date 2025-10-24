@@ -31,7 +31,7 @@ body {
 
 .portal-container {
     width: 100%;
-    /* ★修正: 最大幅を1000pxに設定（実質的に画面全体を使用）*/
+    /* 最大幅を1000pxに設定（実質的に画面全体を使用）*/
     max-width: 1000px;
 
     text-align: center;
@@ -57,18 +57,19 @@ body {
 .link-area {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    /* 間隔を調整（鳥居が大きくなるので少し広げる） */
+    gap: 15px;
     margin-top: 150px;
-    /* ★修正: リンクのリスト全体をコンテナ内で中央寄せ */
     align-items: center;
     padding: 20px 0;
     width: 100%;
 }
 
-/* 鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに限定 */
+/* ★鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに合わせる★ */
 .torii-link {
     display: block;
-    width: 60px;
+    /* ★修正: 幅を60pxから80pxに拡大 */
+    width: 80px;
 
     text-decoration: none;
     background-color: transparent;
@@ -87,9 +88,10 @@ body {
     background-color: transparent;
 }
 
-/* 鳥居画像（<img>タグ）のスタイル */
+/* ★鳥居画像（<img>タグ）のスタイル★ */
 .torii-img {
-    width: 60px;
+    /* ★修正: 幅を60pxから80pxに拡大 */
+    width: 80px;
     height: auto;
     margin: 0;
     background-color: transparent;

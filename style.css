@@ -21,15 +21,19 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center;
+    /* コンテナを水平中央に配置 */
     align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
+    width: 100vw;
+    /* 画面全体を使用 */
 }
 
 .portal-container {
     width: 100%;
-    max-width: 500px;
-    /* ★修正箇所: 500pxに拡大 */
+    /* ★修正: 最大幅を1000pxに設定（実質的に画面全体を使用）*/
+    max-width: 1000px;
+
     text-align: center;
     position: relative;
     padding-bottom: 50px;
@@ -43,10 +47,8 @@ body {
     bottom: 20px;
     left: 0;
 
-    /* SVGの透過対策: 背景色を強制的に透明に */
     background-color: transparent;
 
-    /* JSからのtransformを受け入れるための設定 */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
 }
@@ -57,15 +59,16 @@ body {
     flex-direction: column;
     gap: 10px;
     margin-top: 150px;
+    /* ★修正: リンクのリスト全体をコンテナ内で中央寄せ */
     align-items: center;
     padding: 20px 0;
+    width: 100%;
 }
 
 /* 鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに限定 */
 .torii-link {
     display: block;
     width: 60px;
-    /* 鳥居画像の幅に合わせる */
 
     text-decoration: none;
     background-color: transparent;

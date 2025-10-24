@@ -18,7 +18,9 @@ body {
     background-position: center center;
 
     margin: 0;
-    padding: 20px;
+    /* ★修正: ヘッダーアイコンのために上部のパディングを調整 */
+    padding: 80px 20px 20px;
+
     display: flex;
     justify-content: center;
     /* コンテナを水平中央に配置 */
@@ -29,6 +31,32 @@ body {
     /* 画面全体を使用 */
 }
 
+/* ★追加: ヘッダーアイコン用のコンテナ ★ */
+.header-icon-container {
+    position: absolute;
+    /* 画面に対して絶対位置 */
+    top: 20px;
+    /* 上からの距離 */
+    left: 50%;
+    /* 中央寄せの基準 */
+    transform: translateX(-50%);
+    /* 中央寄せ */
+    z-index: 20;
+    /* 他の要素より手前に表示 */
+    padding: 10px;
+    /* 少し余白 */
+}
+
+/* ★追加: サイトヘッダーアイコンのスタイル ★ */
+.site-header-icon {
+    width: 100px;
+    /* アイコンのサイズを調整 */
+    height: auto;
+    display: block;
+    background-color: transparent;
+    /* SVGの透過対策 */
+}
+
 .portal-container {
     width: 100%;
     /* 最大幅を1000pxに設定（実質的に画面全体を使用）*/
@@ -37,6 +65,8 @@ body {
     text-align: center;
     position: relative;
     padding-bottom: 50px;
+    /* ★修正: ヘッダーアイコンと重ならないように上部マージンを調整 */
+    margin-top: 50px;
 }
 
 /* アマテラス画像の初期設定（JSが位置を制御するための最小限のCSS） */
@@ -57,18 +87,17 @@ body {
 .link-area {
     display: flex;
     flex-direction: column;
-    /* 間隔を調整（鳥居が大きくなるので少し広げる） */
     gap: 15px;
-    margin-top: 150px;
+    /* ★修正: portal-container の margin-top 調整に合わせて再度調整 */
+    margin-top: 50px;
     align-items: center;
     padding: 20px 0;
     width: 100%;
 }
 
-/* ★鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに合わせる★ */
+/* 鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに限定 */
 .torii-link {
     display: block;
-    /* ★修正: 幅を60pxから80pxに拡大 */
     width: 80px;
 
     text-decoration: none;
@@ -88,9 +117,8 @@ body {
     background-color: transparent;
 }
 
-/* ★鳥居画像（<img>タグ）のスタイル★ */
+/* 鳥居画像（<img>タグ）のスタイル */
 .torii-img {
-    /* ★修正: 幅を60pxから80pxに拡大 */
     width: 80px;
     height: auto;
     margin: 0;

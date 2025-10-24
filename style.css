@@ -10,7 +10,7 @@
 body {
     font-family: 'Arial', sans-serif;
 
-    /* ★背景設定: assets/background.svg のパスを適用 */
+    /* 背景設定: assets/background.svg のパスを適用 */
     background-image: url('assets/background.svg');
     background-size: cover;
     background-repeat: no-repeat;
@@ -28,8 +28,8 @@ body {
 
 .portal-container {
     width: 100%;
-    max-width: 400px;
-    /* スマホサイズを意識 */
+    max-width: 500px;
+    /* ★修正箇所: 500pxに拡大 */
     text-align: center;
     position: relative;
     padding-bottom: 50px;
@@ -46,6 +46,7 @@ body {
     /* SVGの透過対策: 背景色を強制的に透明に */
     background-color: transparent;
 
+    /* JSからのtransformを受け入れるための設定 */
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
     z-index: 10;
 }
@@ -54,33 +55,28 @@ body {
 .link-area {
     display: flex;
     flex-direction: column;
-    /* 鳥居のサイズに合わせるため、間隔を調整 */
     gap: 10px;
     margin-top: 150px;
-    /* リンク全体を中央に配置 */
     align-items: center;
     padding: 20px 0;
 }
 
-/* ★鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに合わせる★ */
+/* 鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに限定 */
 .torii-link {
     display: block;
-    /* blockにして幅を設定可能にする */
     width: 60px;
-    /* ★鳥居画像の幅に合わせる（クリック領域をアイコンサイズに限定） */
+    /* 鳥居画像の幅に合わせる */
 
     text-decoration: none;
     background-color: transparent;
     border: none;
     padding: 0;
-    /* パディングを削除 */
     box-shadow: none;
 
     transition: transform 0.2s;
     position: relative;
     overflow: hidden;
     text-align: center;
-    /* 内部の画像も中央に */
 }
 
 .torii-link:hover {
@@ -91,22 +87,10 @@ body {
 /* 鳥居画像（<img>タグ）のスタイル */
 .torii-img {
     width: 60px;
-    /* 画像サイズは60pxを維持 */
     height: auto;
-    /* 横の文字がないため、右マージンは不要 */
     margin: 0;
     background-color: transparent;
 }
-
-/* ★削除: platform-name のスタイルは不要（HTMLから<span>を削除するため）★ */
-/*
-.platform-name {
-    font-weight: bold;
-    color: var(--text-color);
-    flex-grow: 1;
-    text-align: left;
-}
-*/
 
 .caption {
     margin-top: 30px;

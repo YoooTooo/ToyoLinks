@@ -203,34 +203,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const clickX = e.clientX;
-        // 🚨 修正: Y座標も取得
         const clickY = e.clientY;
 
         const containerRect = container.getBoundingClientRect();
 
-        // X方向の移動量計算 (クリック位置をキャラクターの中心にする)
+        // ----------------------------------------------------
+        // X方向の移動量計算
+        // ----------------------------------------------------
         const relativeClickX = clickX - containerRect.left;
         const targetX = relativeClickX - (amaterasuWidth / 2);
 
-        // 🚨 修正: Y方向の移動量計算 (クリック位置をキャラクターの足元ではなく、中心または頭の辺りに合わせる)
+        // ----------------------------------------------------
+        // Y方向の移動量計算
+        // ----------------------------------------------------
         const relativeClickY = clickY - containerRect.top;
 
-        // Y軸の transform は、キャラクターの Y=0 (地面) からの変位量
-        // クリックしたY位置にキャラクターの中心が来るように調整
-        // キャラクターの高さの半分を引く
+        // クリック位置にキャラクターの中心が来るように調整
         let targetY = relativeClickY - (amaterasuHeight / 2);
 
-        // 境界チェック (既存のロジックを再利用して制限)
-        const containerBottomY = containerRect.height;
-        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET); // Y軸の最も上（地面に近い）位置
+        // ----------------------------------------------------
+        // 境界チェックの適用
+        // ----------------------------------------------------
 
-        // Y軸の最大値は 0 (地面)
-        targetY = Math.min(0, targetY);
-        // Y軸の最小値（上端の制限）
-        console.log('minY,', minY)
-        console.log('targetY,', targetY)
-        targetY = Math.max(minY, targetY);
-        console.log('ttargetY', targetY)
+        // Y軸の最大値 (地面: transformY = 0)
+        const maxY = 0;
+
+        // Y軸の最小値 (コンテナの上端付近)
+        // minY = -(コンテナの高さ - キャラクターの高さ - 地面からのオフセット)
+        const containerBottomY = containerRect.height;
+        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
+
+        // 🚨 修正: 計算された targetY が境界内に収まるように制限を適用
+        targetY = Math.min(maxY, targetY); // 0 (地面)より下には行かない
+        targetY = Math.max(minY, targetY); // minY より上 (負の値がより大きい) には行かない
 
         applyTransform(targetX, targetY);
     });

@@ -227,7 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Y軸の最大値は 0 (地面)
         targetY = Math.min(0, targetY);
         // Y軸の最小値（上端の制限）
+        console.log('minY,', minY)
+        console.log('targetY,', targetY)
         targetY = Math.max(minY, targetY);
+        console.log('ttargetY', targetY)
 
         applyTransform(targetX, targetY);
     });

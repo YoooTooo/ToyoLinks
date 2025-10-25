@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // targetY = Math.max(maxY, targetY); // minY より上 (負の値がより大きい) には行かない
         // console.log('targetY', targetY)
 
-        applyTransform(targetX, targetY);
+        applyTransform(targetX, minY);
     });
 
     // =========================================================

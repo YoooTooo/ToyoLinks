@@ -204,41 +204,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const clickX = e.clientX;
         const clickY = e.clientY;
-
         const containerRect = container.getBoundingClientRect();
 
-        // ----------------------------------------------------
         // X方向の移動量計算
-        // ----------------------------------------------------
         const relativeClickX = clickX - containerRect.left;
-        const targetX = relativeClickX - (amaterasuWidth / 2);
+        const absoluteX_px = relativeClickX - (amaterasuWidth / 2);
 
-        // ----------------------------------------------------
-        // Y方向の移動量計算 (🚨 修正点)
-        // ----------------------------------------------------
-        const relativeClickY = clickY - containerRect.top;
+        // Y方向の移動量計算
+        const bottomOfContainer = containerRect.top + containerRect.height;
+        const distance_from_bottom = bottomOfContainer - clickY;
+        const y_offset_from_bottom = distance_from_bottom - INITIAL_BOTTOM_OFFSET;
+        const transformY_px = -y_offset_from_bottom;
 
-        // 🚨 修正: クリックしたY位置にキャラクターの「足元」が来るように調整
-        // キャラクターの高さ(amaterasuHeight)を引くことで、クリック位置が足元になる
-        let targetY = relativeClickY - amaterasuHeight;
-
-        // ----------------------------------------------------
-        // 境界チェックの適用
-        // ----------------------------------------------------
-
-        // Y軸の最大値 (地面: transformY = 0)
-        const maxY = 0;
-
-        // Y軸の最小値 (コンテナの上端付近)
-        // minY = -(コンテナの高さ - キャラクターの高さ - 地面からのオフセット)
-        const containerBottomY = containerRect.height;
-        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
-
-        // 計算された targetY が境界内に収まるように制限を適用
-        targetY = Math.min(maxY, targetY); // 0 (地面)より下には行かない
-        targetY = Math.max(minY, targetY); // minY より上 (負の値がより大きい) には行かない
-
-        applyTransform(targetX, targetY);
+        applyTransform(absoluteX_px, transformY_px);
     });
 
     // =========================================================

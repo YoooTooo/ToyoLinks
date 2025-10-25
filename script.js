@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // minY = -(コンテナの高さ - キャラクターの高さ - 地面からのオフセット)
         const containerBottomY = containerRect.height;
         console.log('containerBottomY', containerBottomY)
-        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
+        const minY = (containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
         console.log('minY', minY)
 
         // 🚨 修正: 計算された targetY が境界内に収まるように制限を適用

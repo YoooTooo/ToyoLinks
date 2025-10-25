@@ -205,13 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickX = e.clientX;
         const clickY = e.clientY;
 
-
-        console.log('clickX', clickX)
-        console.log('clickY', clickY)
-
         const containerRect = container.getBoundingClientRect();
 
-        console.log('containerRect', containerRect)
         // ----------------------------------------------------
         // X方向の移動量計算
         // ----------------------------------------------------
@@ -219,14 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetX = relativeClickX - (amaterasuWidth / 2);
 
         // ----------------------------------------------------
-        // Y方向の移動量計算
+        // Y方向の移動量計算 (🚨 修正点)
         // ----------------------------------------------------
         const relativeClickY = clickY - containerRect.top;
-        console.log('relativeClickY', relativeClickY)
 
-        // クリック位置にキャラクターの中心が来るように調整
-        let targetY = relativeClickY - (amaterasuHeight / 2);
-        console.log('targetY', targetY)
+        // 🚨 修正: クリックしたY位置にキャラクターの「足元」が来るように調整
+        // キャラクターの高さ(amaterasuHeight)を引くことで、クリック位置が足元になる
+        let targetY = relativeClickY - amaterasuHeight;
 
         // ----------------------------------------------------
         // 境界チェックの適用
@@ -238,15 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Y軸の最小値 (コンテナの上端付近)
         // minY = -(コンテナの高さ - キャラクターの高さ - 地面からのオフセット)
         const containerBottomY = containerRect.height;
-        console.log('containerBottomY', containerBottomY)
         const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
-        console.log('minY', minY)
 
-        // 🚨 修正: 計算された targetY が境界内に収まるように制限を適用
+        // 計算された targetY が境界内に収まるように制限を適用
         targetY = Math.min(maxY, targetY); // 0 (地面)より下には行かない
-        console.log('targetY', targetY)
         targetY = Math.max(minY, targetY); // minY より上 (負の値がより大きい) には行かない
-        console.log('targetY', targetY)
 
         applyTransform(targetX, targetY);
     });

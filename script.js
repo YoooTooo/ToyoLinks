@@ -239,16 +239,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // minY = -(コンテナの高さ - キャラクターの高さ - 地面からのオフセット)
         const containerBottomY = containerRect.height;
         console.log('containerBottomY', containerBottomY)
-        const minY = (containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
+        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
         console.log('minY', minY)
 
         // 🚨 修正: 計算された targetY が境界内に収まるように制限を適用
-        // targetY = Math.min(minY, targetY); // 0 (地面)より下には行かない
-        // console.log('targetY', targetY)
-        // targetY = Math.max(maxY, targetY); // minY より上 (負の値がより大きい) には行かない
-        // console.log('targetY', targetY)
+        targetY = Math.min(maxY, targetY); // 0 (地面)より下には行かない
+        console.log('targetY', targetY)
+        targetY = Math.max(minY, targetY); // minY より上 (負の値がより大きい) には行かない
+        console.log('targetY', targetY)
 
-        applyTransform(targetX, -targetY);
+        applyTransform(targetX, targetY);
     });
 
     // =========================================================

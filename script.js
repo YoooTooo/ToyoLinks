@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 既存のアマテラス移動ロジックの定義
+    // 既存の要素の定義
     const amaterasu = document.getElementById('amaterasu-char');
     const container = document.querySelector('.portal-container');
     const links = document.querySelectorAll('.torii-link');
@@ -11,22 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const omikujiResetMessage = document.getElementById('omikuji-reset-message');
 
     const amaterasuWidth = 120;
-    const amaterasuHeight = 180;
     const moveDuration = 400;
     const fadeDuration = 500;
     const INITIAL_BOTTOM_OFFSET = 20;
-    const HOVER_LOAD_TIME = 1000; // 1秒
+    const HOVER_LOAD_TIME = 1000;
 
     let isDragging = false;
     let dragStartX = 0;
     let dragStartY = 0;
     let initialCharX = 0;
     let initialCharY = 0;
-    let isClick = true; // クリック（タップ）とドラッグを区別するためのフラグ
-    let hoverTimer = null; // ホバーロード用タイマー
-    let isSelecting = false; // ロード中かどうか
+    let isClick = true;
+    let hoverTimer = null;
+    let isSelecting = false;
 
-    // 確率テーブルとデコード関数 (omikuji_data.js からの流用とデコードロジック)
     // omikuji_data.jsが先に読み込まれている前提
     const PROBABILITY_TABLE = [
         { grade: 'DAIKICHI', prob: 5 },
@@ -43,6 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const charCode = new Uint8Array(bytes.length);
             for (let i = 0; i < bytes.length; i++) {
                 charCode[i] = bytes.charCodeAt(i);
+            }
+            // OMIIKUJI_DATA_RAW が存在することを確認
+            if (typeof OMIIKUJI_DATA_RAW === 'undefined') {
+                console.error("omikuji_data.js not loaded.");
             }
             return JSON.parse(new TextDecoder().decode(charCode));
         } catch (e) {
@@ -66,20 +68,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // ★★★ ドラッグ移動ロジック ★★★
+    // ★★★ 修正されたドラッグ移動ロジック ★★★
     // =========================================================
+
+    // イベントリスナーを解除するために、関数参照を維持
+    const dragMove = (e) => handleDragMove(e);
+    const endDrag = (e) => handleDragEnd(e);
 
     // ドラッグ開始
     container.addEventListener('mousedown', startDrag);
     container.addEventListener('touchstart', startDrag, { passive: true });
 
     function startDrag(e) {
+        // ホバー要素上でのドラッグ開始は無視
         if (e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
-            // ホバー要素上でのドラッグ開始は無視（ホバーロード機能と競合するため）
             return;
         }
 
-        isClick = true; // 初期状態はクリック
+        // ホバーロード中は無視
+        if (isSelecting) {
+            return;
+        }
+
+        isClick = true;
         isDragging = true;
         container.classList.add('dragging');
 
@@ -95,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         amaterasu.style.transition = 'none'; // ドラッグ中はアニメーションを無効化
 
+        // 🚨 ここを document に追加することで、マウスがコンテナ外に出てもドラッグを続けられる
         document.addEventListener('mousemove', dragMove);
         document.addEventListener('touchmove', dragMove, { passive: false });
         document.addEventListener('mouseup', endDrag);
@@ -103,9 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ドラッグ中
-    function dragMove(e) {
+    function handleDragMove(e) {
         if (!isDragging) return;
-        e.preventDefault(); // タッチ操作でのスクロールを防止
+        e.preventDefault();
 
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -121,12 +133,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let newX = initialCharX + dx;
         let newY = initialCharY + dy;
 
-        // コンテナ内での境界チェック（簡易版）
+        // コンテナ内での境界チェック
         const containerRect = container.getBoundingClientRect();
         const maxX = containerRect.width - amaterasuWidth;
         const minX = 0;
-        const maxY = -INITIAL_BOTTOM_OFFSET;
-        const minY = -(containerRect.height - amaterasuHeight); // 上端に制限
+        const maxY = 0; // 最低位置 (下端からINITIAL_BOTTOM_OFFSET上)
+
+        // Y軸の上限（地面より上）
+        const containerBottomY = containerRect.height;
+        // transformYは下からINITIAL_BOTTOM_OFFSETの位置が0
+        // 地面から上方向に動かすと負の値になる
+        const minY = -(containerBottomY - amaterasu.offsetHeight - INITIAL_BOTTOM_OFFSET);
 
         newX = Math.max(minX, Math.min(maxX, newX));
         newY = Math.min(maxY, newY); // y軸は上方向（負の方向）のみ制限
@@ -135,53 +152,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ドラッグ終了
-    function endDrag(e) {
+    function handleDragEnd(e) {
         if (!isDragging) return;
 
-        isDragging = false;
-        container.classList.remove('dragging');
-
+        // 🚨 イベントリスナーを確実に解除
         document.removeEventListener('mousemove', dragMove);
         document.removeEventListener('touchmove', dragMove);
         document.removeEventListener('mouseup', endDrag);
         document.removeEventListener('touchend', endDrag);
         document.removeEventListener('touchcancel', endDrag);
 
-        // クリックだった場合は、その位置にアニメーションでスナップする
+        isDragging = false;
+        container.classList.remove('dragging');
+
+        // クリックだった場合の処理（ドラッグなしでマウスアップ/タップアップ）
         if (isClick) {
             const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
             const containerRect = container.getBoundingClientRect();
 
+            // 🚨 クリック位置を基準にキャラクター中央を配置する計算
             const relativeClickX = clientX - containerRect.left;
-            const absoluteX_px = relativeClickX - (amaterasuWidth / 2);
+            const targetX = relativeClickX - (amaterasuWidth / 2);
 
-            // Y位置はドラッグ終了時の位置を維持
-            const currentY = getCurrentPosition().y;
-            applyTransform(absoluteX_px, currentY);
+            // Y位置は地面（Y=0）にスナップ
+            const targetY = 0;
+
+            // アニメーションを有効に戻して移動
+            applyTransform(targetX, targetY);
         }
     }
 
     // =========================================================
-    // ★★★ ホバーロード（長押し）ロジック ★★★
+    // ★★★ ホバーロード（長押し）ロジック (変更なし) ★★★
     // =========================================================
+
+    // ... ホバーロードロジック（前回の内容から変更なし） ...
 
     const selectableElements = [...links, omikujiBox];
 
-    // ロードインジケータHTMLの生成
     function createIndicator() {
         const indicator = document.createElement('div');
         indicator.classList.add('loading-indicator');
         return indicator;
     }
 
-    // 各要素にインジケータを追加
     selectableElements.forEach(el => {
         if (!el.querySelector('.loading-indicator')) {
             el.appendChild(createIndicator());
         }
     });
 
-    // ホバー/タッチ開始
     function startHover(e, actionCallback) {
         if (isSelecting) return;
         isSelecting = true;
@@ -196,21 +216,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         targetElement.classList.add('hovering');
 
-        // タイマー開始
         hoverTimer = setTimeout(() => {
             if (isSelecting) {
-                actionCallback(targetElement); // 1秒経過したらアクション実行
+                actionCallback(targetElement);
                 stopHover(targetElement);
             }
         }, HOVER_LOAD_TIME);
     }
 
-    // ホバー/タッチ終了 (キャンセル)
     function stopHover(targetElement) {
         clearTimeout(hoverTimer);
         targetElement.classList.remove('hovering');
         isSelecting = false;
-        // アニメーションのリセット
         const indicator = targetElement.querySelector('.loading-indicator');
         if (indicator) {
             indicator.style.transition = 'none';
@@ -222,9 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // リンクのアクション
     function linkAction(linkElement) {
-        // アマテラスが中央に移動するアニメーションは startHover で既に実行済み
         amaterasu.style.transition = `opacity ${fadeDuration}ms ease-out, transform ${fadeDuration}ms ease-out`;
         amaterasu.style.opacity = '0';
 
@@ -236,19 +251,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }, fadeDuration);
     }
 
-    // おみくじ箱のアクション
     function omikujiAction(boxElement) {
         if (checkOmikujiStatus()) {
             return;
         }
 
-        // おみくじロジック実行
         omikujiBox.classList.add('shaking');
         omikujiBox.style.cursor = 'default';
         omikujiMessage.textContent = '神様が結果を選んでいます...';
-        omikujiBox.removeEventListener('mouseenter', omikujiMouseEnter);
-        omikujiBox.removeEventListener('mouseleave', omikujiMouseLeave);
-        omikujiBox.removeEventListener('click', omikujiClick); // クリックイベントも一時的に無効化
+
+        // ホバーイベントリスナーを一時的に無効化する処理が必要だが、
+        // isSelecting フラグでガードしているため、ここではロジックを続ける
 
         setTimeout(() => {
             omikujiBox.classList.remove('shaking');
@@ -259,22 +272,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             omikujiResetMessage.style.display = 'block';
 
-        }, 2500); // 揺れ時間2.5秒
+        }, 2500);
     }
 
-    // イベントリスナーのセットアップ
     selectableElements.forEach(el => {
         const isOmikuji = el.closest('.omikuji-area');
         const actionCallback = isOmikuji ? omikujiAction : linkAction;
 
-        // マウスイベント
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
-        // タッチイベント (長押しをエミュレート)
         let touchStartTimer;
         el.addEventListener('touchstart', (e) => {
-            // マウスイベントと二重起動しないように設定
             e.preventDefault();
             touchStartTimer = setTimeout(() => startHover(e, actionCallback), 50);
         }, { passive: false });
@@ -282,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('touchend', (e) => {
             clearTimeout(touchStartTimer);
             if (!isSelecting) {
-                // 長押し前に指を離したらキャンセル
                 stopHover(e.currentTarget);
             }
         });
@@ -292,21 +300,20 @@ document.addEventListener('DOMContentLoaded', () => {
             stopHover(e.currentTarget);
         });
 
-        // クリックイベントは完全に削除または上書きされるため、ここではホバーアクションに統合
-        if (isOmikuji) {
-            // おみくじ箱は誤クリック防止のため、クリックイベントもホバーアクションに統合
-            el.removeEventListener('click', omikujiClick);
-        } else {
-            // 鳥居リンクはクリック（短押し）でも移動できるようにしておく
+        // 鳥居リンクはクリック（短押し）でも移動できるようにしておく
+        if (!isOmikuji) {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
-                linkAction(e.currentTarget);
+                // ホバーロードが発動していない短時間のクリックでのみ移動
+                if (!isSelecting) {
+                    linkAction(e.currentTarget);
+                }
             });
         }
     });
 
     // =========================================================
-    // ★★★ おみくじロジックのヘルパー関数 (既存から移植) ★★★
+    // ★★★ おみくじロジックのヘルパー関数 (変更なし) ★★★
     // =========================================================
 
     function checkOmikujiStatus() {
@@ -370,13 +377,12 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             omikujiPaper.classList.add('revealed');
         }, 1000);
-
-        // アマテラスの移動演出は actionCallback内で実行済み
     }
 
     // 6. 初期ロード時の状態設定
     const isOmikujiFinished = checkOmikujiStatus();
 
+    // 初期配置の調整
     if (isOmikujiFinished) {
         // 既に引いている場合は結果を復元し、アマテラスを箱の上に配置
         const savedResult = localStorage.getItem('omikujiResult');

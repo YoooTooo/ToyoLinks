@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // クリック位置にキャラクターの中心が来るように調整
         let targetY = relativeClickY - (amaterasuHeight / 2);
+        console.log('targetY', targetY)
 
         // ----------------------------------------------------
         // 境界チェックの適用
@@ -237,7 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Y軸の最小値 (コンテナの上端付近)
         // minY = -(コンテナの高さ - キャラクターの高さ - 地面からのオフセット)
         const containerBottomY = containerRect.height;
+        console.log('containerBottomY', containerBottomY)
         const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
+        console.log('minY', minY)
 
         // 🚨 修正: 計算された targetY が境界内に収まるように制限を適用
         targetY = Math.min(maxY, targetY); // 0 (地面)より下には行かない

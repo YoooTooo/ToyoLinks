@@ -205,8 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickX = e.clientX;
         const clickY = e.clientY;
 
+
+        console.log('clickX', clickX)
+        console.log('clickY', clickY)
+
         const containerRect = container.getBoundingClientRect();
 
+        console.log('containerRect', containerRect)
         // ----------------------------------------------------
         // X方向の移動量計算
         // ----------------------------------------------------
@@ -217,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Y方向の移動量計算
         // ----------------------------------------------------
         const relativeClickY = clickY - containerRect.top;
+        console.log('relativeClickY', relativeClickY)
 
         // クリック位置にキャラクターの中心が来るように調整
         let targetY = relativeClickY - (amaterasuHeight / 2);

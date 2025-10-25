@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const omikujiResetMessage = document.getElementById('omikuji-reset-message');
 
     const amaterasuWidth = 120;
+    const amaterasuHeight = 180; // 高さも定義
     const moveDuration = 400;
     const fadeDuration = 500;
     const INITIAL_BOTTOM_OFFSET = 20;
@@ -67,33 +68,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // ★★★ 修正されたドラッグ移動ロジック ★★★
+    // ★★★ 修正されたドラッグ移動ロジック（アマテラス要素に限定） ★★★
     // =========================================================
 
     // イベントリスナーを解除するために、関数参照を維持
     const dragMove = (e) => handleDragMove(e);
     const endDrag = (e) => handleDragEnd(e);
 
-    // ドラッグ開始
-    container.addEventListener('mousedown', startDrag);
-    container.addEventListener('touchstart', startDrag, { passive: true });
+    // 🚨 ドラッグイベントリスナーをアマテラス要素に設定し、e.stopPropagation()で背景クリックと分離
+    amaterasu.addEventListener('mousedown', startDrag);
+    amaterasu.addEventListener('touchstart', startDrag, { passive: true });
 
     function startDrag(e) {
-        // 🚨 画面全体をドラッグ領域にするため、以下の判定を削除
-        /*
-        if (e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
-            return;
-        }
-        */
-
         // ホバーロード中はドラッグも無効
         if (isSelecting) {
             return;
         }
 
+        // 🚨 これがないと、ドラッグ開始時に背景（container）のクリックイベントも同時に発火してしまう
+        e.stopPropagation();
+
         isClick = true;
         isDragging = true;
-        container.classList.add('dragging');
+        container.classList.add('dragging'); // コンテナのカーソルは変える
 
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -101,9 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dragStartX = clientX;
         dragStartY = clientY;
 
+        // 🚨 幽体離脱防止: ドラッグ開始時のアマテラスの変位量を取得
         const currentPos = getCurrentPosition();
         initialCharX = currentPos.x;
-        initialCharY = currentPos.y; // 🚨 ドラッグ開始時のY位置を保持
+        initialCharY = currentPos.y;
 
         amaterasu.style.transition = 'none'; // ドラッグ中はアニメーションを無効化
 
@@ -114,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('touchcancel', endDrag);
     }
 
-    // ドラッグ中 (前回修正済み)
+    // ドラッグ中
     function handleDragMove(e) {
         if (!isDragging) return;
         e.preventDefault();
@@ -132,12 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let newX = initialCharX + dx;
         let newY = initialCharY + dy;
 
+        // 境界チェック
         const containerRect = container.getBoundingClientRect();
         const maxX = containerRect.width - amaterasuWidth;
         const minX = 0;
         const maxY = 0;
         const containerBottomY = containerRect.height;
-        const minY = -(containerBottomY - amaterasu.offsetHeight - INITIAL_BOTTOM_OFFSET);
+        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET);
 
         newX = Math.max(minX, Math.min(maxX, newX));
         newY = Math.min(maxY, newY);
@@ -159,24 +158,37 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = false;
         container.classList.remove('dragging');
 
-        // クリックだった場合の処理（ドラッグなしでマウスアップ/タップアップ）
+        // クリックだった場合の処理 (背景ではなくアマテラスを短くタップした場合)
         if (isClick) {
-            const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-            const containerRect = container.getBoundingClientRect();
-
-            const relativeClickX = clientX - containerRect.left;
-            const targetX = relativeClickX - (amaterasuWidth / 2);
-
-            // 🚨 Y軸は現在の位置を維持（ジャンプ後の位置など）。0にスナップしない。
-            const targetY = getCurrentPosition().y;
-
-            // アニメーションを有効に戻して移動
-            applyTransform(targetX, targetY);
+            // タップ時はX軸・Y軸の変更なし (その場でアニメーション付きのY=0へのスナップも不要)
+            // 何もしないことで、キャラクターを「持ち上げようとした」以外のクリック操作を防ぐ
         }
     }
 
     // =========================================================
-    // ★★★ ホバーロード（長押し）ロジック ★★★
+    // ★★★ 背景クリックでX軸移動 (Y軸は維持) ★★★
+    // =========================================================
+    container.addEventListener('click', (e) => {
+        // キャラクター自体、またはホバー要素をクリックした場合は無視
+        if (e.target.closest('#amaterasu-char') || e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
+            return;
+        }
+
+        const clickX = e.clientX;
+        const containerRect = container.getBoundingClientRect();
+
+        // X方向の移動量計算
+        const relativeClickX = clickX - containerRect.left;
+        const targetX = relativeClickX - (amaterasuWidth / 2);
+
+        // Y位置は現在の位置を維持
+        const targetY = getCurrentPosition().y;
+
+        applyTransform(targetX, targetY);
+    });
+
+    // =========================================================
+    // ★★★ ホバーロード（長押し）ロジック (微調整) ★★★
     // =========================================================
 
     const selectableElements = [...links, omikujiBox];
@@ -194,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function startHover(e, actionCallback) {
-        // ホバー要素上でドラッグ開始された場合、ドラッグとホバーが同時に始まるのを防ぐ
+        // ホバー中にドラッグが開始されても無効
         if (isSelecting || isDragging) return;
         isSelecting = true;
         const targetElement = e.currentTarget;
@@ -269,11 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const isOmikuji = el.closest('.omikuji-area');
         const actionCallback = isOmikuji ? omikujiAction : linkAction;
 
-        // マウスイベント
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
-        // タッチイベント
         let touchStartTimer;
         el.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -292,11 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
             stopHover(e.currentTarget);
         });
 
-        // 鳥居リンクはクリック（短押し）でも移動できるようにしておく
         if (!isOmikuji) {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
-                // ホバーロードが発動していない短時間のクリックでのみ移動
                 if (!isSelecting) {
                     linkAction(e.currentTarget);
                 }

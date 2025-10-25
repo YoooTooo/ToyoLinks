@@ -113,9 +113,9 @@ function handleDragEnd(e) {
 
 function handleBackgroundClick(e) {
     // キャラクター自体、またはホバー要素をクリックした場合は無視
-    if (e.target.closest('#amaterasu-char') || e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
-        return;
-    }
+    // if (e.target.closest('#amaterasu-char') || e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
+    //     return;
+    // }
 
     const clickX = e.clientX;
     const clickY = e.clientY;

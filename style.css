@@ -294,3 +294,47 @@ body {
     font-style: italic;
     color: #444;
 }
+
+/* style.css の末尾に追記 */
+
+/* --- ホバーロードインジケータのスタイル --- */
+.loading-indicator {
+    position: absolute;
+    bottom: -15px;
+    /* 要素の下に配置 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 5px;
+    background-color: var(--main-red);
+    transition: width 1s linear;
+    /* 1秒で満タンになるアニメーション */
+    border-radius: 2px;
+    opacity: 0;
+}
+
+/* ホバー中の状態 */
+.hovering .loading-indicator {
+    width: 100%;
+    opacity: 1;
+}
+
+/* 鳥居、おみくじ箱にホバーインジケータを配置するための設定 */
+.torii-link,
+.omikuji-area {
+    position: relative;
+    /* 子要素の loading-indicator を配置 */
+}
+
+/* ドラッグ操作時のカーソル変更 */
+.portal-container {
+    cursor: grab;
+    /* 通常は掴むカーソル */
+    user-select: none;
+    /* テキスト選択を防ぐ */
+}
+
+.portal-container.dragging {
+    cursor: grabbing;
+    /* ドラッグ中は掴んでいるカーソル */
+}

@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // ★★★ 背景クリックでX軸移動 (Y軸は維持) ★★★
+    // ★★★ 背景クリックでX/Y軸移動 ★★★
     // =========================================================
     container.addEventListener('click', (e) => {
         // キャラクター自体、またはホバー要素をクリックした場合は無視
@@ -203,14 +203,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const clickX = e.clientX;
+        // 🚨 修正: Y座標も取得
+        const clickY = e.clientY;
+
         const containerRect = container.getBoundingClientRect();
 
-        // X方向の移動量計算
+        // X方向の移動量計算 (クリック位置をキャラクターの中心にする)
         const relativeClickX = clickX - containerRect.left;
         const targetX = relativeClickX - (amaterasuWidth / 2);
 
-        // Y位置は現在の位置を維持
-        const targetY = getCurrentPosition().y;
+        // 🚨 修正: Y方向の移動量計算 (クリック位置をキャラクターの足元ではなく、中心または頭の辺りに合わせる)
+        const relativeClickY = clickY - containerRect.top;
+
+        // Y軸の transform は、キャラクターの Y=0 (地面) からの変位量
+        // クリックしたY位置にキャラクターの中心が来るように調整
+        // キャラクターの高さの半分を引く
+        let targetY = relativeClickY - (amaterasuHeight / 2);
+
+        // 境界チェック (既存のロジックを再利用して制限)
+        const containerBottomY = containerRect.height;
+        const minY = -(containerBottomY - amaterasuHeight - INITIAL_BOTTOM_OFFSET); // Y軸の最も上（地面に近い）位置
+
+        // Y軸の最大値は 0 (地面)
+        targetY = Math.min(0, targetY);
+        // Y軸の最小値（上端の制限）
+        targetY = Math.max(minY, targetY);
 
         applyTransform(targetX, targetY);
     });

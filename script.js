@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < bytes.length; i++) {
                 charCode[i] = bytes.charCodeAt(i);
             }
-            // OMIIKUJI_DATA_RAW が存在することを確認
             if (typeof OMIIKUJI_DATA_RAW === 'undefined') {
                 console.error("omikuji_data.js not loaded.");
             }
@@ -80,12 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
     container.addEventListener('touchstart', startDrag, { passive: true });
 
     function startDrag(e) {
-        // ホバー要素上でのドラッグ開始は無視
+        // 🚨 画面全体をドラッグ領域にするため、以下の判定を削除
+        /*
         if (e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
             return;
         }
+        */
 
-        // ホバーロード中は無視
+        // ホバーロード中はドラッグも無効
         if (isSelecting) {
             return;
         }
@@ -102,11 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentPos = getCurrentPosition();
         initialCharX = currentPos.x;
-        initialCharY = currentPos.y;
+        initialCharY = currentPos.y; // 🚨 ドラッグ開始時のY位置を保持
 
         amaterasu.style.transition = 'none'; // ドラッグ中はアニメーションを無効化
 
-        // 🚨 ここを document に追加することで、マウスがコンテナ外に出てもドラッグを続けられる
         document.addEventListener('mousemove', dragMove);
         document.addEventListener('touchmove', dragMove, { passive: false });
         document.addEventListener('mouseup', endDrag);
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('touchcancel', endDrag);
     }
 
-    // ドラッグ中
+    // ドラッグ中 (前回修正済み)
     function handleDragMove(e) {
         if (!isDragging) return;
         e.preventDefault();
@@ -125,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const dx = clientX - dragStartX;
         const dy = clientY - dragStartY;
 
-        // 5ピクセル以上動いたら、クリックではなくドラッグと判断
         if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
             isClick = false;
         }
@@ -133,20 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let newX = initialCharX + dx;
         let newY = initialCharY + dy;
 
-        // コンテナ内での境界チェック
         const containerRect = container.getBoundingClientRect();
         const maxX = containerRect.width - amaterasuWidth;
         const minX = 0;
-        const maxY = 0; // 最低位置 (下端からINITIAL_BOTTOM_OFFSET上)
-
-        // Y軸の上限（地面より上）
+        const maxY = 0;
         const containerBottomY = containerRect.height;
-        // transformYは下からINITIAL_BOTTOM_OFFSETの位置が0
-        // 地面から上方向に動かすと負の値になる
         const minY = -(containerBottomY - amaterasu.offsetHeight - INITIAL_BOTTOM_OFFSET);
 
         newX = Math.max(minX, Math.min(maxX, newX));
-        newY = Math.min(maxY, newY); // y軸は上方向（負の方向）のみ制限
+        newY = Math.min(maxY, newY);
 
         amaterasu.style.transform = `translateX(${newX}px) translateY(${newY}px)`;
     }
@@ -155,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleDragEnd(e) {
         if (!isDragging) return;
 
-        // 🚨 イベントリスナーを確実に解除
+        // イベントリスナーを確実に解除
         document.removeEventListener('mousemove', dragMove);
         document.removeEventListener('touchmove', dragMove);
         document.removeEventListener('mouseup', endDrag);
@@ -170,12 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
             const containerRect = container.getBoundingClientRect();
 
-            // 🚨 クリック位置を基準にキャラクター中央を配置する計算
             const relativeClickX = clientX - containerRect.left;
             const targetX = relativeClickX - (amaterasuWidth / 2);
 
-            // Y位置は地面（Y=0）にスナップ
-            const targetY = 0;
+            // 🚨 Y軸は現在の位置を維持（ジャンプ後の位置など）。0にスナップしない。
+            const targetY = getCurrentPosition().y;
 
             // アニメーションを有効に戻して移動
             applyTransform(targetX, targetY);
@@ -183,10 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // ★★★ ホバーロード（長押し）ロジック (変更なし) ★★★
+    // ★★★ ホバーロード（長押し）ロジック ★★★
     // =========================================================
-
-    // ... ホバーロードロジック（前回の内容から変更なし） ...
 
     const selectableElements = [...links, omikujiBox];
 
@@ -203,7 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function startHover(e, actionCallback) {
-        if (isSelecting) return;
+        // ホバー要素上でドラッグ開始された場合、ドラッグとホバーが同時に始まるのを防ぐ
+        if (isSelecting || isDragging) return;
         isSelecting = true;
         const targetElement = e.currentTarget;
 
@@ -260,9 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
         omikujiBox.style.cursor = 'default';
         omikujiMessage.textContent = '神様が結果を選んでいます...';
 
-        // ホバーイベントリスナーを一時的に無効化する処理が必要だが、
-        // isSelecting フラグでガードしているため、ここではロジックを続ける
-
         setTimeout(() => {
             omikujiBox.classList.remove('shaking');
             omikujiMessage.textContent = '本日のおみくじ結果';
@@ -275,13 +264,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2500);
     }
 
+    // イベントリスナーのセットアップ
     selectableElements.forEach(el => {
         const isOmikuji = el.closest('.omikuji-area');
         const actionCallback = isOmikuji ? omikujiAction : linkAction;
 
+        // マウスイベント
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
+        // タッチイベント
         let touchStartTimer;
         el.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -384,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初期配置の調整
     if (isOmikujiFinished) {
-        // 既に引いている場合は結果を復元し、アマテラスを箱の上に配置
         const savedResult = localStorage.getItem('omikujiResult');
         if (savedResult) {
             const resultData = JSON.parse(savedResult);
@@ -405,7 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTransform(absoluteBoxX_px, 0);
 
     } else {
-        // まだ引いていない場合はアマテラスを中央に配置
         const initialPositionX = (container.clientWidth / 2) - (amaterasuWidth / 2);
         applyTransform(initialPositionX, 0);
     }

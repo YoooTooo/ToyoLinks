@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const omikujiResetMessage = document.getElementById('omikuji-reset-message');
 
     const amaterasuWidth = 120;
-    const amaterasuHeight = 180; // 高さも定義
+    const amaterasuHeight = 180;
     const moveDuration = 400;
     const fadeDuration = 500;
     const INITIAL_BOTTOM_OFFSET = 20;
@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStartY = 0;
     let initialCharX = 0;
     let initialCharY = 0;
+
+    // 🚨 修正: ポインターとキャラ左上隅のオフセットを保持する変数
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
     let isClick = true;
     let hoverTimer = null;
     let isSelecting = false;
@@ -37,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     function decodeBase64(encoded) {
+        // ... (省略)
         try {
             const bytes = atob(encoded);
             const charCode = new Uint8Array(bytes.length);
@@ -75,33 +81,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const dragMove = (e) => handleDragMove(e);
     const endDrag = (e) => handleDragEnd(e);
 
-    // 🚨 ドラッグイベントリスナーをアマテラス要素に設定し、e.stopPropagation()で背景クリックと分離
+    // ドラッグイベントリスナーをアマテラス要素に設定
     amaterasu.addEventListener('mousedown', startDrag);
     amaterasu.addEventListener('touchstart', startDrag, { passive: true });
 
     function startDrag(e) {
-        // ホバーロード中はドラッグも無効
         if (isSelecting) {
             return;
         }
 
-        // 🚨 これがないと、ドラッグ開始時に背景（container）のクリックイベントも同時に発火してしまう
         e.stopPropagation();
 
         isClick = true;
         isDragging = true;
-        container.classList.add('dragging'); // コンテナのカーソルは変える
+        container.classList.add('dragging');
 
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
+        // 🚨 修正: ドラッグ開始座標を記録
         dragStartX = clientX;
         dragStartY = clientY;
 
-        // 🚨 幽体離脱防止: ドラッグ開始時のアマテラスの変位量を取得
         const currentPos = getCurrentPosition();
         initialCharX = currentPos.x;
         initialCharY = currentPos.y;
+
+        // 🚨 修正: 幽体離脱防止の核となる処理
+        // クリックされた位置とキャラの左上隅（現在の transform 位置）の差をオフセットとして記録
+        const charRect = amaterasu.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        // charRect.left は画面左上からの絶対座標、containerRect.left はコンテナの絶対座標
+        // キャラの左上隅の座標（コンテナ内での相対座標）
+        const charLeftInContainer = charRect.left - containerRect.left;
+        const charTopInContainer = charRect.top - containerRect.top;
+
+        // クリック位置（コンテナ内での相対座標）
+        const clickXInContainer = clientX - containerRect.left;
+        const clickYInContainer = clientY - containerRect.top;
+
+        // ポインタがキャラの左上隅からどれだけ離れているか（オフセット）を計算
+        dragOffsetX = clickXInContainer - initialCharX; // X軸オフセット
+        dragOffsetY = clickYInContainer - initialCharY; // Y軸オフセット
+
+        // console.log(`Start: CharX=${initialCharX}, ClickX=${clickXInContainer}, OffsetX=${dragOffsetX}`);
+
 
         amaterasu.style.transition = 'none'; // ドラッグ中はアニメーションを無効化
 
@@ -120,18 +145,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        const dx = clientX - dragStartX;
-        const dy = clientY - dragStartY;
+        const containerRect = container.getBoundingClientRect();
 
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        // 🚨 修正: 新しい位置は、現在のポインタ位置からオフセットを引いた場所
+        const clickXInContainer = clientX - containerRect.left;
+        const clickYInContainer = clientY - containerRect.top;
+
+        // 新しいキャラの左上隅のX/Y座標
+        let newX = clickXInContainer - dragOffsetX;
+        let newY = clickYInContainer - dragOffsetY;
+
+        // 5ピクセル以上動いたら、クリックではなくドラッグと判断
+        if (Math.abs(newX - initialCharX) > 5 || Math.abs(newY - initialCharY) > 5) {
             isClick = false;
         }
 
-        let newX = initialCharX + dx;
-        let newY = initialCharY + dy;
-
         // 境界チェック
-        const containerRect = container.getBoundingClientRect();
         const maxX = containerRect.width - amaterasuWidth;
         const minX = 0;
         const maxY = 0;
@@ -158,10 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = false;
         container.classList.remove('dragging');
 
-        // クリックだった場合の処理 (背景ではなくアマテラスを短くタップした場合)
+        // アマテラスを短くタップした場合（isClick=true）は、何もしない（Y軸スナップも行わない）
         if (isClick) {
-            // タップ時はX軸・Y軸の変更なし (その場でアニメーション付きのY=0へのスナップも不要)
-            // 何もしないことで、キャラクターを「持ち上げようとした」以外のクリック操作を防ぐ
+            // 短いタップの場合は、アマテラスを動かさない
         }
     }
 
@@ -188,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================
-    // ★★★ ホバーロード（長押し）ロジック (微調整) ★★★
+    // ★★★ ホバーロード（長押し）ロジック (変更なし) ★★★
     // =========================================================
 
     const selectableElements = [...links, omikujiBox];
@@ -206,12 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function startHover(e, actionCallback) {
-        // ホバー中にドラッグが開始されても無効
         if (isSelecting || isDragging) return;
         isSelecting = true;
         const targetElement = e.currentTarget;
 
-        // アマテラスを要素の上に移動させる (演出)
         const elementRect = targetElement.closest('.omikuji-area') ? omikujiArea.getBoundingClientRect() : targetElement.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         const elementCenterX = (elementRect.left + elementRect.width / 2) - containerRect.left;
@@ -287,6 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let touchStartTimer;
         el.addEventListener('touchstart', (e) => {
             e.preventDefault();
+            // 🚨 タッチイベントがアマテラスのドラッグと競合しないよう、アマテラス要素でのイベント伝播を止める
+            e.stopPropagation();
             touchStartTimer = setTimeout(() => startHover(e, actionCallback), 50);
         }, { passive: false });
 
@@ -312,10 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // =========================================================
-    // ★★★ おみくじロジックのヘルパー関数 (変更なし) ★★★
-    // =========================================================
-
+    // ... (おみくじロジックと初期配置は省略)
     function checkOmikujiStatus() {
         const lastDrawDate = localStorage.getItem('lastDrawDate');
         const now = new Date();

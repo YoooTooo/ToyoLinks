@@ -131,3 +131,166 @@ body {
     font-size: 1.1em;
     font-weight: bold;
 }
+
+/* style.css の末尾に追記 */
+
+/* --- おみくじエリアのスタイル --- */
+.omikuji-area {
+    margin-top: 40px;
+    padding: 20px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.omikuji-message {
+    color: var(--text-color);
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.omikuji-box {
+    width: 150px;
+    height: auto;
+    transition: transform 0.3s ease-out;
+}
+
+/* --- おみくじ箱の揺れアニメーション --- */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+}
+
+.shaking {
+    animation: shake 0.1s infinite;
+}
+
+/* --- 結果表示エリアのスタイル --- */
+.omikuji-result {
+    text-align: center;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.omikuji-reset-message {
+    color: var(--main-red);
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* --- おみくじ用紙のCSS演出 --- */
+.paper-container {
+    perspective: 800px;
+    width: 200px;
+    height: 300px;
+}
+
+.omikuji-paper {
+    width: 100%;
+    height: 100%;
+    background-color: #fff9e6;
+    /* 薄い黄色 */
+    border: 1px solid #e0c9a0;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'serif';
+    color: var(--text-color);
+
+    /* 初期状態: 隠れていて、回転している */
+    transform: translateY(-500px) rotateX(90deg) scale(0.5);
+    opacity: 0;
+    transition: all 1.5s ease-out;
+}
+
+/* 登場アニメーション後の状態 */
+.omikuji-paper.revealed {
+    transform: translateY(0) rotateX(0deg) scale(1);
+    opacity: 1;
+}
+
+/* 紙の中身 */
+.result-omikuji {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: var(--main-red);
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--main-red);
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.result-kanji-section {
+    margin: 15px 0;
+}
+
+.result-kanji {
+    font-size: 3em;
+    line-height: 1;
+    font-weight: 900;
+    color: #000000;
+}
+
+.result-yomi {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.result-explanation {
+    margin-top: 15px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.jp-text {
+    margin-bottom: 5px;
+}
+
+.en-text {
+    font-style: italic;
+    color: #444;
+}

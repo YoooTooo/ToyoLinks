@@ -1,56 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Script loading attempt: Ready to run logic.");
-    console.log("Script executed: DOMContentLoaded.");
-
+    // 既存のアマテラス移動ロジックの定義
     const amaterasu = document.getElementById('amaterasu-char');
     const container = document.querySelector('.portal-container');
     const links = document.querySelectorAll('.torii-link');
-
-    // CSSと一致させる定数
     const amaterasuWidth = 120;
-    const amaterasuHeight = 180; // 計算用として維持
-
-    // アニメーション時間
+    const amaterasuHeight = 180;
     const moveDuration = 400;
     const fadeDuration = 500;
-
-    // CSSの初期位置の基準値（bottom: 20px は維持）
     const INITIAL_BOTTOM_OFFSET = 20;
 
     // アマテラスにtransformを適用するコア関数
     function applyTransform(xOffset, yOffset) {
-        // ★修正: CSSの translateX(-50%) が無くなったため、
-        // 左端 (left: 0) からの絶対ピクセル値として transform を適用
         const transformValue = `translateX(${xOffset}px) translateY(${yOffset}px)`;
-
-        console.log(`Applying Transform: X=${xOffset.toFixed(2)}px, Y=${yOffset.toFixed(2)}px`);
-        console.log(`transformValue: ${transformValue}`);
         amaterasu.style.transition = `transform ${moveDuration}ms ease-in-out`;
         amaterasu.style.transform = transformValue;
     }
 
-    // --- 画面全体のクリックイベント ---
+    // --- 画面全体のクリックイベント (アマテラス移動) ---
     container.addEventListener('click', (e) => {
-        if (!e.target.closest('.torii-link')) {
-            const clickX = e.clientX; // ページ左端からのクリックX座標
-            const clickY = e.clientY; // ページ上端からのクリックY座標
-
-            const containerRect = container.getBoundingClientRect();
-
-            // 1. X方向の移動量計算
-            // left: 0 からの移動量 ＝ (クリックX - コンテナ左端) - (アマテラスの幅 / 2)
-            const relativeClickX = clickX - containerRect.left;
-            const absoluteX_px = relativeClickX - (amaterasuWidth / 2); // アマテラスの中心をクリック位置に合わせる
-
-            // 2. Y方向の移動量計算（足元合わせロジックはそのまま）
-            const bottomOfContainer = containerRect.top + containerRect.height;
-            const distance_from_bottom = bottomOfContainer - clickY;
-            const y_offset_from_bottom = distance_from_bottom - INITIAL_BOTTOM_OFFSET;
-            const transformY_px = -y_offset_from_bottom; // 上方向がマイナス
-
-            // アマテラスを移動
-            applyTransform(absoluteX_px, transformY_px); // ★絶対X位置を適用
+        // おみくじ箱エリア内または鳥居リンクをクリックした場合はアマテラスを動かさない
+        if (e.target.closest('.omikuji-area') || e.target.closest('.torii-link')) {
+            return;
         }
+
+        const clickX = e.clientX;
+        const clickY = e.clientY;
+        const containerRect = container.getBoundingClientRect();
+
+        // X方向の移動量計算
+        const relativeClickX = clickX - containerRect.left;
+        const absoluteX_px = relativeClickX - (amaterasuWidth / 2);
+
+        // Y方向の移動量計算
+        const bottomOfContainer = containerRect.top + containerRect.height;
+        const distance_from_bottom = bottomOfContainer - clickY;
+        const y_offset_from_bottom = distance_from_bottom - INITIAL_BOTTOM_OFFSET;
+        const transformY_px = -y_offset_from_bottom;
+
+        applyTransform(absoluteX_px, transformY_px);
     });
 
     // --- リンク（鳥居）のクリックイベント ---
@@ -59,30 +46,27 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const targetUrl = link.href;
 
-            // X方向の移動量計算 (鳥居の中心へ)
+            // X方向の移動量計算
             const linkRect = link.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
-
-            // ★修正: left: 0 からの絶対ピクセル位置を計算
             const linkCenterX = (linkRect.left + linkRect.width / 2) - containerRect.left;
-            const absoluteLinkX_px = linkCenterX - (amaterasuWidth / 2); // 鳥居の中心にアマテラスの中心を合わせる
+            const absoluteLinkX_px = linkCenterX - (amaterasuWidth / 2);
 
-            // リンククリック時は、Y方向の引数は0（CSSの bottom: 20px の初期Y位置を維持）
+            // リンクに移動する際、Y軸の変動をなくす
             const y_pos_link_click = 0;
 
-            // 1. 移動アニメーション実行
             applyTransform(absoluteLinkX_px, y_pos_link_click);
 
-            // 2. 移動完了後に消えるアニメーション（神隠し）
             setTimeout(() => {
+                // キャラクターをフェードアウトさせる
                 amaterasu.style.transition = `opacity ${fadeDuration}ms ease-out, transform ${fadeDuration}ms ease-out`;
                 amaterasu.style.opacity = '0';
 
-                // 消えるときも最後の位置を維持しつつ、上にフワッと移動
+                // フェードアウトと同時に少し上に移動する演出
                 const final_fade_transform = `translateX(${absoluteLinkX_px}px) translateY(-30px)`;
                 amaterasu.style.transform = final_fade_transform;
 
-                // 3. 完全に消えた後にページを遷移
+                // フェードアウト後、ページ遷移
                 setTimeout(() => {
                     window.location.href = targetUrl;
                 }, fadeDuration);
@@ -91,8 +75,182 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ★ページロード時の初期位置設定（左中央から中央下へ移動）
-    // スクリプトロード後、一度だけ初期位置を設定してアマテラスを画面中央下に配置
+    // ★ページロード時の初期位置設定
+    // コンテナの幅を元にアマテラスを中央に配置
     const initialPositionX = (container.clientWidth / 2) - (amaterasuWidth / 2);
-    applyTransform(initialPositionX, 0); // Y=0 は bottom: 20px の初期位置を意味する
+    applyTransform(initialPositionX, 0);
+
+    // =========================================================
+    // ★★★ おみくじロジックの追加 ★★★
+    // =========================================================
+
+    const omikujiBox = document.getElementById('omikuji-box');
+    const omikujiResultDiv = document.getElementById('omikuji-result');
+    const omikujiPaper = document.querySelector('.omikuji-paper');
+    const omikujiMessage = document.getElementById('omikuji-message');
+    const omikujiResetMessage = document.getElementById('omikuji-reset-message');
+
+    // 確率テーブル (合計100)
+    const PROBABILITY_TABLE = [
+        { grade: 'DAIKICHI', prob: 5 },  // 大吉: 5%
+        { grade: 'CHUKICHI', prob: 20 }, // 中吉: 20%
+        { grade: 'SYOKICHI', prob: 20 }, // 小吉: 20%
+        { grade: 'SUEKICHI', prob: 20 }, // 末吉: 20%
+        { grade: 'KYO', prob: 20 },      // 凶: 20%
+        { grade: 'DAIKYO', prob: 15 }   // 大凶: 15% (合計100%になるように調整)
+    ];
+
+    // Base64デコード関数 (暗号化解除)
+    function decodeBase64(encoded) {
+        try {
+            // btoaはUTF-8を考慮しないため、TextDecoderを使うことで日本語のデコードエラーを防ぐ
+            const bytes = atob(encoded);
+            const charCode = new Uint8Array(bytes.length);
+            for (let i = 0; i < bytes.length; i++) {
+                charCode[i] = bytes.charCodeAt(i);
+            }
+            return JSON.parse(new TextDecoder().decode(charCode));
+        } catch (e) {
+            console.error("Base64 Decode Error:", e);
+            return { omikuji: '???', kanji: '??', yomi: 'よみ', jp: 'データエラーが発生しました', en: 'Data error occurred' };
+        }
+    }
+
+    // 1. おみくじの制限チェック (ローカルタイムの正午12時にリセット)
+    function checkOmikujiStatus() {
+        const lastDrawDate = localStorage.getItem('lastDrawDate');
+        const now = new Date();
+        const today = now.toDateString();
+
+        // リセット時刻（本日の正午12:00）を設定
+        const resetTime = new Date(now);
+        resetTime.setHours(12, 0, 0, 0);
+
+        // 現在時刻が正午12時を過ぎていたら、リセット時刻を「翌日」の12時に設定
+        if (now.getHours() >= 12) {
+            resetTime.setDate(now.getDate() + 1);
+        }
+
+        // 最後の引いた日付と今日の日付が一致している、かつ、現在時刻がリセット時刻（翌日正午）を過ぎていない場合
+        if (lastDrawDate === today && localStorage.getItem('omikujiResult')) {
+            // 本日既に引いている場合は引けない状態にする
+            omikujiBox.style.cursor = 'default';
+            omikujiMessage.textContent = '本日のおみくじは終了しました';
+            omikujiResetMessage.style.display = 'block';
+            return true;
+        }
+
+        // リセット時刻を過ぎていたら、または本日初めてであれば、状態をクリア
+        if (lastDrawDate !== today || now.getTime() >= resetTime.getTime()) {
+            localStorage.removeItem('omikujiResult');
+            localStorage.removeItem('lastDrawDate');
+            return false;
+        }
+    }
+
+    // 2. おみくじを引く（確率計算）
+    function drawOmikuji() {
+        let total = 0;
+        PROBABILITY_TABLE.forEach(item => total += item.prob);
+        const rand = Math.random() * total;
+        let cumulative = 0;
+
+        for (const item of PROBABILITY_TABLE) {
+            cumulative += item.prob;
+            if (rand < cumulative) {
+                return item.grade;
+            }
+        }
+        return PROBABILITY_TABLE[0].grade; // フォールバック (大吉)
+    }
+
+    // 3. 結果の表示
+    function showResult(grade) {
+        // 漢字データを取得
+        const kanjiArray = OMIIKUJI_DATA_RAW[grade];
+        const randomIndex = Math.floor(Math.random() * kanjiArray.length);
+        const encodedData = kanjiArray[randomIndex];
+
+        // デコードして結果を取得
+        const resultData = decodeBase64(encodedData);
+
+        // ローカルストレージに結果を保存
+        localStorage.setItem('omikujiResult', JSON.stringify(resultData));
+        localStorage.setItem('lastDrawDate', new Date().toDateString());
+
+        // UIに反映
+        document.getElementById('result-omikuji').textContent = resultData.omikuji;
+        document.getElementById('result-kanji').textContent = resultData.kanji;
+        document.getElementById('result-yomi').textContent = resultData.yomi;
+        document.getElementById('result-jp').textContent = resultData.jp;
+        document.getElementById('result-en').textContent = resultData.en;
+
+        omikujiResultDiv.style.display = 'flex';
+        // 揺れアニメーション後に紙を出すため、遅延
+        setTimeout(() => {
+            omikujiPaper.classList.add('revealed');
+        }, 1000);
+
+        // アマテラスを箱の位置に移動させる (アマテラスの移動演出)
+        const boxRect = omikujiBox.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        const boxCenterX = (boxRect.left + boxRect.width / 2) - containerRect.left;
+        const absoluteBoxX_px = boxCenterX - (amaterasuWidth / 2);
+
+        const y_pos_box_click = 0;
+        applyTransform(absoluteBoxX_px, y_pos_box_click);
+    }
+
+    // 4. クリックハンドラ
+    omikujiBox.addEventListener('click', () => {
+        if (checkOmikujiStatus()) {
+            // 既に引いている場合は何もしない
+            return;
+        }
+
+        // 演出開始
+        omikujiBox.classList.add('shaking');
+        omikujiBox.style.cursor = 'default';
+        omikujiMessage.textContent = '神様が結果を選んでいます...';
+
+        // 演出アニメーションが終了したら結果を出す
+        setTimeout(() => {
+            omikujiBox.classList.remove('shaking');
+            omikujiMessage.textContent = '本日のおみくじ結果';
+
+            const grade = drawOmikuji();
+            showResult(grade);
+
+            // 終了メッセージを表示
+            omikujiResetMessage.style.display = 'block';
+
+        }, 2500); // 揺れ時間2.5秒
+    });
+
+    // 5. 初期ロード時の状態チェック
+    if (checkOmikujiStatus()) {
+        // 既に引いている場合は結果を復元
+        const savedResult = localStorage.getItem('omikujiResult');
+        if (savedResult) {
+            const resultData = JSON.parse(savedResult);
+            // UIに反映
+            document.getElementById('result-omikuji').textContent = resultData.omikuji;
+            document.getElementById('result-kanji').textContent = resultData.kanji;
+            document.getElementById('result-yomi').textContent = resultData.yomi;
+            document.getElementById('result-jp').textContent = resultData.jp;
+            document.getElementById('result-en').textContent = resultData.en;
+
+            omikujiResultDiv.style.display = 'flex';
+            omikujiPaper.classList.add('revealed');
+        }
+
+        // アマテラスを箱の位置に移動させる (初期位置)
+        const boxRect = omikujiBox.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const boxCenterX = (boxRect.left + boxRect.width / 2) - containerRect.left;
+        const absoluteBoxX_px = boxCenterX - (amaterasuWidth / 2);
+        applyTransform(absoluteBoxX_px, 0);
+
+    }
 });

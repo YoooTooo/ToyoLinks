@@ -11,11 +11,41 @@
 </head>
 
 <body>
+
+    <script src="omikuji_data.js"></script>
+
     <div class="header-icon-container">
         <img src="assets/icon.svg" alt="サイトアイコン" class="site-header-icon">
     </div>
+
     <div class="portal-container">
         <img id="amaterasu-char" src="assets/amaterasu.svg" alt="アマテラス" class="amaterasu">
+
+        <div class="omikuji-area">
+            <p class="omikuji-message" id="omikuji-message">
+                タップするとおみくじが引けます
+            </p>
+            <img src="assets/omikuji-box.svg" alt="おみくじ箱" class="omikuji-box" id="omikuji-box">
+        </div>
+
+        <div class="omikuji-result" id="omikuji-result" style="display: none;">
+            <div class="paper-container">
+                <div class="omikuji-paper">
+                    <div class="result-omikuji" id="result-omikuji"></div>
+                    <div class="result-kanji-section">
+                        <div class="result-kanji" id="result-kanji"></div>
+                        <div class="result-yomi" id="result-yomi"></div>
+                    </div>
+                    <div class="result-explanation">
+                        <p class="jp-text" id="result-jp"></p>
+                        <p class="en-text" id="result-en"></p>
+                    </div>
+                </div>
+            </div>
+            <p class="omikuji-reset-message" id="omikuji-reset-message" style="display: none;">
+                また明日引に来てね<br>Come back tomorrow!
+            </p>
+        </div>
 
         <div class="link-area">
             <a href="YOUR_YOUTUBE_URL" class="torii-link" data-platform="youtube">
@@ -35,7 +65,10 @@
             </a>
         </div>
 
-        <p class="caption">タップしてアマテラスと一緒に学ぶ世界へ！</p>
+        <p class="caption">
+            日常で使える生きた日本語を学ぼう
+        </p>
+
     </div>
 
     <script src="script.js"></script>

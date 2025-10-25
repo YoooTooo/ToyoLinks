@@ -243,9 +243,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('minY', minY)
 
         // 🚨 修正: 計算された targetY が境界内に収まるように制限を適用
-        targetY = Math.min(maxY, targetY); // 0 (地面)より下には行かない
+        targetY = Math.min(minY, targetY); // 0 (地面)より下には行かない
         console.log('targetY', targetY)
-        targetY = Math.max(minY, targetY); // minY より上 (負の値がより大きい) には行かない
+        targetY = Math.max(maxY, targetY); // minY より上 (負の値がより大きい) には行かない
         console.log('targetY', targetY)
 
         applyTransform(targetX, targetY);

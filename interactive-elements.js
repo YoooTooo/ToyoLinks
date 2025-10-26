@@ -45,13 +45,10 @@ function createIndicator() {
 }
 
 function startHover(e, actionCallback) {
-    // isDragging は amaterasu-movement.js のローカル変数ですが、
-    // ここではグローバルな isSelecting フラグのみをチェックします。
     if (window.isSelecting) return;
     window.isSelecting = true;
     const targetElement = e.currentTarget;
 
-    // アマテラスを要素の上に移動させる (演出)
     const elementRect = targetElement.closest('.omikuji-area') ? omikujiArea.getBoundingClientRect() : targetElement.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     const elementCenterX = (elementRect.left + elementRect.width / 2) - containerRect.left;
@@ -184,7 +181,6 @@ function omikujiAction(boxElement) {
 }
 
 window.restoreOmikujiStateAndPosition = function () {
-    // おみくじ結果の復元とアマテラスの位置調整
     const isOmikujiFinished = checkOmikujiStatus();
 
     if (isOmikujiFinished) {
@@ -205,7 +201,7 @@ window.restoreOmikujiStateAndPosition = function () {
         const containerRect = container.getBoundingClientRect();
         const boxCenterX = (boxRect.left + boxRect.width / 2) - containerRect.left;
         const absoluteBoxX_px = boxCenterX - (amaterasuWidth / 2);
-        applyTransform(absoluteBoxX_px, 0);
+        applyTransform(absoluteX_px, 0);
     }
 }
 
@@ -220,37 +216,66 @@ window.setupInteractiveElements = function () {
         const isOmikuji = el.closest('.omikuji-area');
         const actionCallback = isOmikuji ? omikujiAction : linkAction;
 
+        // マウスイベントは変更なし
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
-        let touchStartTimer;
+        // ★★★ 修正箇所: タッチイベントロジックの改善 ★★★
+        let touchStartTime = 0;
+        const TOUCH_CLICK_THRESHOLD = 200; // 200ms以内に指を離したらクリックと見なす
+
         el.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            touchStartTimer = setTimeout(() => startHover(e, actionCallback), 50);
-        }, { passive: false });
+            // e.preventDefault() は touchstart では使用しない (スクロールやシステム動作を妨げるため)
+            // e.stopPropagation() はドラッグと競合する場合に使うが、今回は short tap を優先
+            touchStartTime = Date.now();
+            clearTimeout(hoverTimer); // 短いタップでホバーが始まらないように念のためクリア
+            // ホバータイマーを短めに設定して、長押しを検知
+            hoverTimer = setTimeout(() => startHover(e, actionCallback), HOVER_LOAD_TIME);
+        }, { passive: true }); // passive: true にしてスクロールパフォーマンスを改善
 
         el.addEventListener('touchend', (e) => {
-            clearTimeout(touchStartTimer);
-            if (!window.isSelecting) {
+            clearTimeout(hoverTimer);
+
+            // 🚨 ここで短時間タップをチェック
+            const duration = Date.now() - touchStartTime;
+
+            if (duration < TOUCH_CLICK_THRESHOLD && !window.isSelecting) {
+                // 短時間タップ（クリック）と判断
+                if (isOmikuji) {
+                    omikujiAction(e.currentTarget);
+                } else {
+                    linkAction(e.currentTarget);
+                }
+            }
+
+            // ホバーが発動した場合は停止処理
+            if (window.isSelecting) {
                 stopHover(e.currentTarget);
             }
         });
 
         el.addEventListener('touchcancel', (e) => {
-            clearTimeout(touchStartTimer);
+            clearTimeout(hoverTimer);
             stopHover(e.currentTarget);
         });
 
+        // PCのクリックイベントはそのまま維持 (短時間タップ時のフォールバックとして機能)
         if (!isOmikuji) {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
+                // マウスでの短時間クリックは、ホバーロードが発動していなければ即時遷移
                 if (!window.isSelecting) {
                     linkAction(e.currentTarget);
+                }
+            });
+        } else {
+            // おみくじはマウスでの短時間クリックでも実行できるようにする
+            el.addEventListener('click', (e) => {
+                // ホバーロードが発動していなければ即時実行（PCでの操作を想定）
+                if (!window.isSelecting) {
+                    omikujiAction(e.currentTarget);
                 }
             });
         }
     });
 };
-
-// omikuji_data.js が先に読み込まれている場合、その後の処理は setupInteractiveElements 内で実行されます

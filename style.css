@@ -110,6 +110,7 @@ body {
     position: relative;
     overflow: hidden;
     text-align: center;
+    z-index: 15;
 }
 
 .torii-link:hover {
@@ -123,6 +124,7 @@ body {
     height: auto;
     margin: 0;
     background-color: transparent;
+    z-index: 15;
 }
 
 .caption {
@@ -153,6 +155,7 @@ body {
     width: 150px;
     height: auto;
     transition: transform 0.3s ease-out;
+    z-index: 15;
 }
 
 /* --- おみくじ箱の揺れアニメーション --- */

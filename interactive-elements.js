@@ -17,7 +17,7 @@ const PROBABILITY_TABLE = [
 ];
 
 function decodeBase64(encoded) {
-    // ... (前回の decodeBase64 関数を全文移植)
+    // ... (decodeBase64 関数)
     try {
         const bytes = atob(encoded);
         const charCode = new Uint8Array(bytes.length);
@@ -45,7 +45,9 @@ function createIndicator() {
 }
 
 function startHover(e, actionCallback) {
-    if (window.isSelecting) return;
+    // 🚨 修正: ドラッグ中、または既に選択処理中の場合は処理を中止
+    if (window.isSelecting || window.isDragging) return;
+
     window.isSelecting = true;
     const targetElement = e.currentTarget;
 
@@ -96,7 +98,7 @@ function linkAction(linkElement) {
 // おみくじロジック
 // =======================
 
-function checkOmikujiStatus() {
+window.checkOmikujiStatus = function () {
     const lastDrawDate = localStorage.getItem('lastDrawDate');
     const now = new Date();
     const today = now.toDateString();
@@ -181,6 +183,7 @@ function omikujiAction(boxElement) {
 }
 
 window.restoreOmikujiStateAndPosition = function () {
+    // おみくじ結果の復元とアマテラスの位置調整
     const isOmikujiFinished = checkOmikujiStatus();
 
     if (isOmikujiFinished) {
@@ -201,7 +204,7 @@ window.restoreOmikujiStateAndPosition = function () {
         const containerRect = container.getBoundingClientRect();
         const boxCenterX = (boxRect.left + boxRect.width / 2) - containerRect.left;
         const absoluteBoxX_px = boxCenterX - (amaterasuWidth / 2);
-        applyTransform(absoluteX_px, 0);
+        applyTransform(absoluteBoxX_px, 0);
     }
 }
 
@@ -216,7 +219,7 @@ window.setupInteractiveElements = function () {
         const isOmikuji = el.closest('.omikuji-area');
         const actionCallback = isOmikuji ? omikujiAction : linkAction;
 
-        // マウスイベントは変更なし
+        // マウスイベント
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
@@ -225,18 +228,15 @@ window.setupInteractiveElements = function () {
         const TOUCH_CLICK_THRESHOLD = 200; // 200ms以内に指を離したらクリックと見なす
 
         el.addEventListener('touchstart', (e) => {
-            // e.preventDefault() は touchstart では使用しない (スクロールやシステム動作を妨げるため)
-            // e.stopPropagation() はドラッグと競合する場合に使うが、今回は short tap を優先
             touchStartTime = Date.now();
-            clearTimeout(hoverTimer); // 短いタップでホバーが始まらないように念のためクリア
-            // ホバータイマーを短めに設定して、長押しを検知
+            clearTimeout(hoverTimer);
+            // 長押しを検知するためのホバータイマーを設定
             hoverTimer = setTimeout(() => startHover(e, actionCallback), HOVER_LOAD_TIME);
-        }, { passive: true }); // passive: true にしてスクロールパフォーマンスを改善
+        }, { passive: true });
 
         el.addEventListener('touchend', (e) => {
             clearTimeout(hoverTimer);
 
-            // 🚨 ここで短時間タップをチェック
             const duration = Date.now() - touchStartTime;
 
             if (duration < TOUCH_CLICK_THRESHOLD && !window.isSelecting) {
@@ -259,19 +259,16 @@ window.setupInteractiveElements = function () {
             stopHover(e.currentTarget);
         });
 
-        // PCのクリックイベントはそのまま維持 (短時間タップ時のフォールバックとして機能)
+        // PCのクリックイベント
         if (!isOmikuji) {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
-                // マウスでの短時間クリックは、ホバーロードが発動していなければ即時遷移
                 if (!window.isSelecting) {
                     linkAction(e.currentTarget);
                 }
             });
         } else {
-            // おみくじはマウスでの短時間クリックでも実行できるようにする
             el.addEventListener('click', (e) => {
-                // ホバーロードが発動していなければ即時実行（PCでの操作を想定）
                 if (!window.isSelecting) {
                     omikujiAction(e.currentTarget);
                 }

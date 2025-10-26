@@ -3,7 +3,8 @@
 // =========================================================
 
 // グローバルな変数を window オブジェクトから取得 (script.jsで定義済み)
-let isDragging = false;
+window.isDragging = false; // 🚨 修正: window スコープで宣言し、グローバル化
+
 let isClick = true;
 let dragOffsetX = 0;
 let dragOffsetY = 0;
@@ -29,11 +30,11 @@ const dragMove = (e) => handleDragMove(e);
 const endDrag = (e) => handleDragEnd(e);
 
 function startDrag(e) {
-    if (window.isSelecting) return; // interactive-elements.js のフラグを使用
+    if (window.isSelecting) return;
 
     e.stopPropagation();
     isClick = true;
-    isDragging = true;
+    window.isDragging = true; // 🚨 修正: window.isDragging を使用
     container.classList.add('dragging');
 
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -44,7 +45,6 @@ function startDrag(e) {
     let initialCharY = currentPos.y;
 
     // 幽体離脱防止のオフセット計算
-    const charRect = amaterasu.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     const clickXInContainer = clientX - containerRect.left;
     const clickYInContainer = clientY - containerRect.top;
@@ -62,7 +62,7 @@ function startDrag(e) {
 }
 
 function handleDragMove(e) {
-    if (!isDragging) return;
+    if (!window.isDragging) return; // 🚨 修正: window.isDragging を使用
     e.preventDefault();
 
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -93,7 +93,7 @@ function handleDragMove(e) {
 }
 
 function handleDragEnd(e) {
-    if (!isDragging) return;
+    if (!window.isDragging) return; // 🚨 修正
 
     document.removeEventListener('mousemove', dragMove);
     document.removeEventListener('touchmove', dragMove);
@@ -101,7 +101,7 @@ function handleDragEnd(e) {
     document.removeEventListener('touchend', endDrag);
     document.removeEventListener('touchcancel', endDrag);
 
-    isDragging = false;
+    window.isDragging = false; // 🚨 修正
     container.classList.remove('dragging');
 
     // タップ時（isClick=true）は移動しない
@@ -113,9 +113,9 @@ function handleDragEnd(e) {
 
 function handleBackgroundClick(e) {
     // キャラクター自体、またはホバー要素をクリックした場合は無視
-    // if (e.target.closest('#amaterasu-char') || e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
-    //     return;
-    // }
+    if (e.target.closest('#amaterasu-char') || e.target.closest('.torii-link') || e.target.closest('.omikuji-area')) {
+        return;
+    }
 
     const clickX = e.clientX;
     const clickY = e.clientY;

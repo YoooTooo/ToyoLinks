@@ -138,10 +138,16 @@ body {
 
 /* --- おみくじエリアのスタイル --- */
 .omikuji-area {
+    /* interactive-element の基底スタイルを継承 */
     margin-top: 40px;
     padding: 20px;
-    cursor: pointer;
     text-align: center;
+
+    /* 🚨 修正: z-indexを有効化するために position を追加 */
+    position: relative;
+
+    /* z-index は interactive-element で設定済みですが、明示的に設定するならここ */
+    z-index: 15;
 }
 
 .omikuji-message {

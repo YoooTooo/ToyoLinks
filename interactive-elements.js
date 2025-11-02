@@ -8,12 +8,12 @@ let hoverTimer = null;
 
 // omikuji_data.jsが先に読み込まれている前提
 const PROBABILITY_TABLE = [
-    { grade: 'DAIKICHI', prob: 5 },
+    { grade: 'DAIKICHI', prob: 10 },
     { grade: 'CHUKICHI', prob: 20 },
     { grade: 'SYOKICHI', prob: 20 },
     { grade: 'SUEKICHI', prob: 20 },
     { grade: 'KYO', prob: 20 },
-    { grade: 'DAIKYO', prob: 15 }
+    { grade: 'DAIKYO', prob: 10 }
 ];
 
 function decodeBase64(encoded) {

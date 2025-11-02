@@ -202,7 +202,7 @@ window.restoreOmikujiStateAndPosition = function () {
     // おみくじ結果の復元とアマテラスの位置調整
     const isOmikujiFinished = checkOmikujiStatus();
 
-    // ★修正: 終了していない場合は結果表示コンテナを非表示にしておく
+    // ★修正: 終了していない場合は結果表示コンテナを非表示にしておく (画面が暗くなる問題対策)
     if (!isOmikujiFinished) {
         omikujiResultDiv.style.display = 'none';
     }

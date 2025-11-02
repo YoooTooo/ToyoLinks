@@ -256,11 +256,6 @@ body {
 
 /* 古い .omikuji-paper は新しい .omikuji-paper-design で置き換えられるが、アニメーションは流用 */
 .omikuji-paper {
-    /* ここは新しいスタイルで上書きされるため、一旦コメントアウトまたは削除推奨 */
-    /* width: 100%; height: 100%; background-color: #fff9e6; border: 1px solid #e0c9a0; */
-    /* border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
-    /* padding: 20px; box-sizing: border-box; font-family: 'serif'; color: var(--text-color); */
-
     /* アニメーション関連のスタイルは維持 */
     transform: translateY(-500px) rotateX(90deg) scale(0.5);
     opacity: 0;
@@ -273,8 +268,6 @@ body {
     opacity: 1;
 }
 
-/* 古い紙の中身のスタイルは新しいクラスで上書きされる */
-/* .result-omikuji, .result-kanji-section, .result-kanji, .result-yomi, .result-explanation, .jp-text, .en-text の古い定義は無視 */
 /* ======================================================= */
 
 
@@ -325,7 +318,6 @@ body {
 /* ======================================================= */
 
 /* フォントのインポート (例: Google Fonts) */
-/* 筆文字風フォントが必要な場合は、以下の@importをHTMLの<head>タグまたはCSSファイルの先頭に移動してください */
 @import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap');
 
 /* --- おみくじ結果表示デザイン --- */
@@ -341,7 +333,7 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    /* ★修正: 初期状態で非表示にする ★ */
+    /* ★修正: 初期状態で非表示にする (暗くなる問題対策) ★ */
     display: none;
 }
 

@@ -16,19 +16,29 @@ const PROBABILITY_TABLE = [
     { grade: 'DAIKYO', prob: 10 }
 ];
 
+
 function decodeBase64(encoded) {
-    // ... (decodeBase64 関数)
     try {
-        const bytes = atob(encoded);
-        const charCode = new Uint8Array(bytes.length);
-        for (let i = 0; i < bytes.length; i++) {
-            charCode[i] = bytes.charCodeAt(i);
+        // 1. Base64文字列をバイナリ文字列としてデコード
+        const binaryString = atob(encoded);
+
+        // 2. バイナリ文字列をUTF-8バイト配列に変換（文字化けを防ぐ要所）
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            // charCodeAt()は0〜255のバイト値を返すため、Latin1を経由しても値は保持される
+            bytes[i] = binaryString.charCodeAt(i);
         }
-        // グローバル変数 OMIIKUJI_DATA_RAW のチェックは不要
-        return JSON.parse(new TextDecoder().decode(charCode));
+
+        // 3. UTF-8バイト配列をTextDecoderでJSON文字列に変換
+        const jsonString = new TextDecoder('utf-8').decode(bytes);
+
+        // 4. JSON文字列をパースしてオブジェクトを返す
+        return JSON.parse(jsonString);
+
     } catch (e) {
         console.error("Base64 Decode Error:", e);
-        // エラー時のデータに新しいフィールドを追加
+        // エラー時のデータ（エラー時に新しいフィールドも含むように修正済み）
         return { omikuji: '???', kanji: '??', yomi: 'よみ', omikujiyomi: 'error', omikujimeaning: 'Data Error', meaning: 'error', jp: 'データエラーが発生しました', en: 'Data error occurred' };
     }
 }

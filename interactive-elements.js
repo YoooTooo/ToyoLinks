@@ -177,8 +177,27 @@ function showResult(grade) {
     }, 1000);
 }
 
+// ★★★ 追加: おみくじ結果を閉じる関数 ★★★
+function closeOmikujiResult() {
+    omikujiPaper.classList.remove('revealed');
+    // アニメーションが終わってからオーバーレイを閉じる
+    setTimeout(() => {
+        omikujiResultDiv.style.display = 'none';
+    }, 1500); // CSSの transition時間 (1.5s) に合わせる
+}
+// ★★★ 追加終了 ★★★
+
+
 function omikujiAction(boxElement) {
     if (checkOmikujiStatus()) {
+        // ★修正: 既に終了している場合は、結果を表示する (いつでも見れる機能)
+        const savedResult = localStorage.getItem('omikujiResult');
+        if (savedResult) {
+            // 既に結果が引かれている場合は、復元ロジックを利用して表示
+            restoreOmikujiStateAndPosition();
+            omikujiResultDiv.style.display = 'flex';
+            omikujiPaper.classList.add('revealed');
+        }
         return;
     }
 
@@ -213,7 +232,7 @@ window.restoreOmikujiStateAndPosition = function () {
         const savedResult = localStorage.getItem('omikujiResult');
         if (savedResult) {
             const resultData = JSON.parse(savedResult);
-            // ★★★ 修正箇所: 新しいフィールドの復元 (変更なし) ★★★
+            // ★★★ 新しいフィールドの復元 (変更なし) ★★★
             document.getElementById('result-omikuji').textContent = resultData.omikuji;
             document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi;
             document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning;
@@ -225,8 +244,8 @@ window.restoreOmikujiStateAndPosition = function () {
             // ★★★ 修正箇所終了 ★★★
 
             // 復元が必要な場合はここで表示する
-            omikujiResultDiv.style.display = 'flex';
-            omikujiPaper.classList.add('revealed');
+            // omikujiResultDiv.style.display = 'flex'; // omikujiActionで実行するためコメントアウト
+            // omikujiPaper.classList.add('revealed'); // omikujiActionで実行するためコメントアウト
         }
 
         const boxRect = omikujiBox.getBoundingClientRect();
@@ -237,7 +256,7 @@ window.restoreOmikujiStateAndPosition = function () {
     }
 }
 
-// メインのセットアップ関数 (変更なし)
+// メインのセットアップ関数
 window.setupInteractiveElements = function () {
     const selectableElements = [...links, omikujiBox];
     selectableElements.forEach(el => {
@@ -304,4 +323,19 @@ window.setupInteractiveElements = function () {
             });
         }
     });
+
+    // ★★★ 追加: おみくじ結果オーバーレイを閉じるためのイベントリスナー ★★★
+    if (omikujiResultDiv) {
+        omikujiResultDiv.addEventListener('click', (e) => {
+            // おみくじ紙自体（.omikuji-paper-design）がクリックされた場合は閉じないようにする
+            // オーバーレイの黒い部分がクリックされたら閉じる
+            if (e.target === omikujiResultDiv) {
+                closeOmikujiResult();
+            }
+        });
+
+        // 紙をクリックした際も閉じるようにする場合は以下も追加
+        omikujiPaper.addEventListener('click', closeOmikujiResult);
+    }
+    // ★★★ 追加終了 ★★★
 };

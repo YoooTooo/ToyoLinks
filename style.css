@@ -5,6 +5,16 @@
     --accent-gold: #ffcc00;
     /* アクセントカラー */
     --text-color: #333333;
+
+    /* ★追加: おみくじデザイン用カラー変数 ★ */
+    --omikuji-paper: #fffaf0;
+    /* 和紙のようなアイボリー色 */
+    --omikuji-border: #8B4513;
+    /* 茶色い枠線 */
+    --omikuji-accent: #a0522d;
+    /* 運勢テキスト色 */
+    --omikuji-main-kanji: #d2691e;
+    /* 漢字テキスト色 */
 }
 
 body {
@@ -213,8 +223,15 @@ body {
     animation: shake 0.1s infinite;
 }
 
-/* --- 結果表示エリアのスタイル --- */
+
+/* ======================================================= */
+/* ★★★ 古いおみくじ用紙のCSSを新しい縦長デザインで上書き/置き換え ★★★ */
+/* ======================================================= */
+
+/* --- 結果表示エリアのスタイル (上書き) --- */
+/* .omikuji-result は .omikuji-result-container に置き換えられるが、衝突を避けるためここでは変更しない */
 .omikuji-result {
+    /* 以前のスタイルを保持 */
     text-align: center;
     margin-top: 30px;
     display: flex;
@@ -222,6 +239,7 @@ body {
     align-items: center;
 }
 
+/* 古い .omikuji-reset-message は新しいスタイルで上書き */
 .omikuji-reset-message {
     color: var(--main-red);
     font-size: 1.1em;
@@ -229,27 +247,21 @@ body {
     margin-top: 20px;
 }
 
-/* --- おみくじ用紙のCSS演出 --- */
+/* 古い .paper-container は使用しないため、ここでは残すのみ */
 .paper-container {
     perspective: 800px;
     width: 200px;
     height: 450px;
 }
 
+/* 古い .omikuji-paper は新しい .omikuji-paper-design で置き換えられるが、アニメーションは流用 */
 .omikuji-paper {
-    width: 100%;
-    height: 100%;
-    background-color: #fff9e6;
-    /* 薄い黄色 */
-    border: 1px solid #e0c9a0;
-    border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    box-sizing: border-box;
-    font-family: 'serif';
-    color: var(--text-color);
+    /* ここは新しいスタイルで上書きされるため、一旦コメントアウトまたは削除推奨 */
+    /* width: 100%; height: 100%; background-color: #fff9e6; border: 1px solid #e0c9a0; */
+    /* border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
+    /* padding: 20px; box-sizing: border-box; font-family: 'serif'; color: var(--text-color); */
 
-    /* 初期状態: 隠れていて、回転している */
+    /* アニメーション関連のスタイルは維持 */
     transform: translateY(-500px) rotateX(90deg) scale(0.5);
     opacity: 0;
     transition: all 1.5s ease-out;
@@ -261,50 +273,10 @@ body {
     opacity: 1;
 }
 
-/* 紙の中身 */
-.result-omikuji {
-    font-size: 2.2em;
-    font-weight: bold;
-    color: var(--main-red);
-    margin-bottom: 10px;
-    border-bottom: 2px solid var(--main-red);
-    padding-bottom: 5px;
-    display: inline-block;
-}
+/* 古い紙の中身のスタイルは新しいクラスで上書きされる */
+/* .result-omikuji, .result-kanji-section, .result-kanji, .result-yomi, .result-explanation, .jp-text, .en-text の古い定義は無視 */
+/* ======================================================= */
 
-.result-kanji-section {
-    margin: 15px 0;
-}
-
-.result-kanji {
-    font-size: 3em;
-    line-height: 1;
-    font-weight: 900;
-    color: #000000;
-}
-
-.result-yomi {
-    font-size: 0.9em;
-    color: #666;
-    margin-top: 5px;
-}
-
-.result-explanation {
-    margin-top: 15px;
-    font-size: 0.9em;
-    line-height: 1.4;
-}
-
-.jp-text {
-    margin-bottom: 5px;
-}
-
-.en-text {
-    font-style: italic;
-    color: #444;
-}
-
-/* style.css の末尾に追記 */
 
 /* --- ホバーロードインジケータのスタイル --- */
 .loading-indicator {
@@ -346,4 +318,208 @@ body {
 .portal-container.dragging {
     cursor: grabbing;
     /* ドラッグ中は掴んでいるカーソル */
+}
+
+/* ======================================================= */
+/* ★★★ 追記: おみくじデザインの修正CSS (縦長、和風) ★★★ */
+/* ======================================================= */
+
+/* フォントのインポート (例: Google Fonts) */
+/* 筆文字風フォントが必要な場合は、以下の@importをHTMLの<head>タグまたはCSSファイルの先頭に移動してください */
+@import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap');
+
+/* --- おみくじ結果表示デザイン --- */
+.omikuji-result-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* 半透明のオーバーレイ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* display: none; は JS で制御 */
+}
+
+.omikuji-paper-design {
+    width: 300px;
+    /* 縦長にするため幅を狭く */
+    max-height: 80vh;
+    /* 画面の高さに応じて調整 */
+    background-color: var(--omikuji-paper);
+    /* 和紙のようなアイボリー色 */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><rect fill="%23fffaf0" width="10" height="10"/><path fill="%23f0ead6" d="M0 0h10v10H0zM2 2h6v6H2zM1 1h8v8H1z" opacity=".2"/></svg>');
+    /* 和紙風のテクスチャ */
+    border: 3px solid var(--omikuji-border);
+    /* 茶色い枠線 */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    /* 縦並び */
+    justify-content: space-between;
+    /* 要素を上下に配置 */
+    overflow-y: auto;
+    /* 内容が長い場合はスクロール */
+    /* アニメーションは .omikuji-paper クラスに任せる */
+}
+
+/* 登場アニメーション後の状態 (旧クラス名を流用) */
+.omikuji-paper.revealed {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg) scale(1);
+    /* 旧アニメーションを適用 */
+}
+
+.omikuji-top-section {
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--omikuji-accent);
+    /* 点線で区切り */
+    padding-bottom: 10px;
+}
+
+.omikuji-title {
+    font-family: 'Hina Mincho', serif;
+    /* 筆文字風フォント (仮) */
+    font-size: 2.2em;
+    color: var(--omikuji-border);
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.omikuji-grade-text {
+    font-family: 'Hina Mincho', serif;
+    /* 筆文字風フォント */
+    font-size: 3.5em;
+    /* 大きく */
+    color: var(--omikuji-accent);
+    margin: 0;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.omikuji-grade-details {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-top: 5px;
+}
+
+.omikuji-kanji-section {
+    display: flex;
+    flex-direction: column;
+    /* 縦並び */
+    align-items: center;
+    gap: 10px;
+    /* 要素間のスペース */
+    margin-bottom: 15px;
+}
+
+.kanji-display-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-kanji-char {
+    font-family: 'Hina Mincho', serif;
+    /* 筆文字風フォント */
+    font-size: 5em;
+    /* 最も大きく */
+    color: var(--omikuji-main-kanji);
+    /* 鮮やかなオレンジブラウン */
+    margin: 0;
+    line-height: 1;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+.kanji-readings-meanings {
+    font-size: 0.9em;
+    color: var(--text-color);
+    line-height: 1.4;
+    text-align: center;
+}
+
+.seal-area {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--main-red);
+    /* 赤い印鑑風の枠 */
+    border-radius: 50%;
+    /* 丸い印鑑 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    /* 上部との間隔 */
+}
+
+.seal-text {
+    font-family: 'Hina Mincho', serif;
+    /* 和風フォント */
+    font-size: 2.5em;
+    color: var(--main-red);
+    /* 赤色 */
+    line-height: 1;
+    transform: rotate(-10deg);
+    /* 少し傾ける */
+    opacity: 0.8;
+}
+
+.omikuji-divider {
+    border: none;
+    border-top: 1px solid var(--omikuji-border);
+    /* ベージュ系の線 */
+    margin: 15px 0;
+}
+
+.omikuji-description-section {
+    text-align: left;
+    font-size: 0.95em;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 15px;
+    flex-grow: 1;
+    /* スペースを埋める */
+}
+
+.result-description-jp,
+.result-description-en {
+    margin-bottom: 10px;
+}
+
+.omikuji-reset-text {
+    font-size: 0.85em;
+    color: #888;
+    margin-top: 20px;
+    border-top: 1px dashed var(--omikuji-border);
+    /* 点線で区切り */
+    padding-top: 10px;
+}
+
+/* おみくじ箱のメッセージも日英対応 */
+.omikuji-message .en-message {
+    display: block;
+    /* 常に表示 */
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* 英語メッセージのスタイル */
+.en-message {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 8px;
+    /* 日本語との間に少しスペース */
+}
+
+/* ホバーインジケーターの色変更 */
+.loading-indicator {
+    background-color: var(--omikuji-main-kanji);
+    /* おみくじの色と合わせる */
 }

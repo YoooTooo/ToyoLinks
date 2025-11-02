@@ -46,7 +46,6 @@ function decodeBase64(encoded) {
 // =======================
 // ホバーロードロジック (変更なし)
 // =======================
-// ... (startHover, stopHover, linkAction などの関数は変更なし) ...
 
 function createIndicator() {
     const indicator = document.createElement('div');
@@ -69,9 +68,6 @@ function startHover(e, actionCallback) {
 
     targetElement.classList.add('hovering');
 
-    // loading-indicatorの表示ロジックはCSSで行う前提で、ここでは省略
-    // もしJSで制御が必要なら、ここに実装します。
-
     hoverTimer = setTimeout(() => {
         if (window.isSelecting) {
             actionCallback(targetElement);
@@ -86,8 +82,6 @@ function stopHover(targetElement) {
     window.isSelecting = false;
     const indicator = targetElement.querySelector('.loading-indicator');
     if (indicator) {
-        // スタイル変更をCSSで行う場合は、このJSコードは不要な場合があります。
-        //ここでは元コードのロジックを維持します。
         indicator.style.transition = 'none';
         indicator.style.width = '0';
         indicator.style.opacity = '0';
@@ -207,6 +201,12 @@ function omikujiAction(boxElement) {
 window.restoreOmikujiStateAndPosition = function () {
     // おみくじ結果の復元とアマテラスの位置調整
     const isOmikujiFinished = checkOmikujiStatus();
+
+    // ★修正: 終了していない場合は結果表示コンテナを非表示にしておく
+    if (!isOmikujiFinished) {
+        omikujiResultDiv.style.display = 'none';
+    }
+    // ★修正終了
 
     if (isOmikujiFinished) {
         const savedResult = localStorage.getItem('omikujiResult');

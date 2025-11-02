@@ -341,7 +341,8 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    /* display: none; は JS で制御 */
+    /* ★修正: 初期状態で非表示にする ★ */
+    display: none;
 }
 
 .omikuji-paper-design {

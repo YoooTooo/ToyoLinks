@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.omikujiArea = document.querySelector('.omikuji-area');
     window.omikujiBox = document.getElementById('omikuji-box');
     window.omikujiResultDiv = document.getElementById('omikuji-result');
-    window.omikujiPaper = document.querySelector('.omikuji-paper');
+    // ★修正: IDセレクタを使っておみくじ用紙を確実に取得
+    window.omikujiPaper = document.getElementById('omikuji-paper');
     window.omikujiMessage = document.getElementById('omikuji-message');
     window.omikujiResetMessage = document.getElementById('omikuji-reset-message');
 
@@ -22,10 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.HOVER_LOAD_TIME = 1000;
 
     // 3. アマテラスの初期配置 (interactive-elements.js の関数を呼び出す)
-    // restoreOmikujiStateAndPosition, applyTransform は他のファイルで定義されます
+    // restoreOmikujiStateAndPosition, applyTransform, checkOmikujiStatus は他のファイルで定義されます
     if (checkOmikujiStatus()) {
+        // おみくじ終了済みなら結果を復元し、アマテラスをその位置に移動
         restoreOmikujiStateAndPosition();
     } else {
+        // 未実施なら中央に配置
         const initialPositionX = (container.clientWidth / 2) - (amaterasuWidth / 2);
         applyTransform(initialPositionX, 0);
     }

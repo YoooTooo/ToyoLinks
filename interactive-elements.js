@@ -121,7 +121,11 @@ window.checkOmikujiStatus = function () {
 
     if (lastDrawDate === today && localStorage.getItem('omikujiResult')) {
         omikujiBox.style.cursor = 'default';
-        omikujiMessage.textContent = '本日のおみくじは終了しました';
+
+        // ★★★ 修正箇所: メッセージの変更 ★★★
+        omikujiMessage.innerHTML = '本日のおみくじは終了しました。<br><span class="en-message">Tap to view your result again.</span>';
+        // ★★★ 修正箇所終了 ★★★
+
         omikujiResetMessage.style.display = 'block';
         return true;
     }
@@ -129,6 +133,10 @@ window.checkOmikujiStatus = function () {
     if (lastDrawDate !== today || now.getTime() >= resetTime.getTime()) {
         localStorage.removeItem('omikujiResult');
         localStorage.removeItem('lastDrawDate');
+
+        // ★修正: 初期状態のメッセージに戻す
+        omikujiMessage.innerHTML = 'タップするとおみくじが引けます<br><span class="en-message">Tap to draw your omikuji (fortune).</span>';
+
         return false;
     }
 }
@@ -177,7 +185,7 @@ function showResult(grade) {
     }, 1000);
 }
 
-// ★★★ 追加: おみくじ結果を閉じる関数 ★★★
+// ★★★ おみくじ結果を閉じる関数 (変更なし) ★★★
 function closeOmikujiResult() {
     omikujiPaper.classList.remove('revealed');
     // アニメーションが終わってからオーバーレイを閉じる
@@ -185,12 +193,14 @@ function closeOmikujiResult() {
         omikujiResultDiv.style.display = 'none';
     }, 1500); // CSSの transition時間 (1.5s) に合わせる
 }
-// ★★★ 追加終了 ★★★
+// ★★★ 終了 ★★★
 
 
 function omikujiAction(boxElement) {
+
+    // ★★★ 修正箇所: メッセージを「結果を見る」内容に統一 ★★★
     if (checkOmikujiStatus()) {
-        // ★修正: 既に終了している場合は、結果を表示する (いつでも見れる機能)
+        // 既に終了している場合は、結果を表示する (いつでも見れる機能)
         const savedResult = localStorage.getItem('omikujiResult');
         if (savedResult) {
             // 既に結果が引かれている場合は、復元ロジックを利用して表示
@@ -200,6 +210,7 @@ function omikujiAction(boxElement) {
         }
         return;
     }
+    // ★★★ 修正箇所終了 ★★★
 
     omikujiBox.classList.add('shaking');
     omikujiBox.style.cursor = 'default';
@@ -207,7 +218,10 @@ function omikujiAction(boxElement) {
 
     setTimeout(() => {
         omikujiBox.classList.remove('shaking');
-        omikujiMessage.textContent = '本日のおみくじ結果';
+
+        // ★★★ 修正箇所: 結果表示後のメッセージを更新 ★★★
+        omikujiMessage.innerHTML = '本日のおみくじは終了しました。<br><span class="en-message">Tap to view your result again.</span>';
+        // ★★★ 修正箇所終了 ★★★
 
         const grade = drawOmikuji();
         showResult(grade);
@@ -219,7 +233,7 @@ function omikujiAction(boxElement) {
 
 window.restoreOmikujiStateAndPosition = function () {
 
-    // ★★★ 修正: 確実に非表示にリセットする ★★★
+    // ★★★ 修正: 確実に非表示にリセットする (変更なし) ★★★
     if (omikujiResultDiv) {
         omikujiResultDiv.style.display = 'none';
     }
@@ -227,6 +241,8 @@ window.restoreOmikujiStateAndPosition = function () {
 
     // おみくじ結果の復元とアマテラスの位置調整
     const isOmikujiFinished = checkOmikujiStatus();
+
+    // isOmikujiFinished が true の場合、checkOmikujiStatus内でメッセージが更新されているはず
 
     if (isOmikujiFinished) {
         const savedResult = localStorage.getItem('omikujiResult');
@@ -243,7 +259,6 @@ window.restoreOmikujiStateAndPosition = function () {
             document.getElementById('result-en').textContent = resultData.en;
             // ★★★ 修正箇所終了 ★★★
 
-            // 復元が必要な場合はここで表示する
             // omikujiResultDiv.style.display = 'flex'; // omikujiActionで実行するためコメントアウト
             // omikujiPaper.classList.add('revealed'); // omikujiActionで実行するためコメントアウト
         }
@@ -324,18 +339,17 @@ window.setupInteractiveElements = function () {
         }
     });
 
-    // ★★★ 追加: おみくじ結果オーバーレイを閉じるためのイベントリスナー ★★★
+    // ★★★ おみくじ結果オーバーレイを閉じるためのイベントリスナー (変更なし) ★★★
     if (omikujiResultDiv) {
         omikujiResultDiv.addEventListener('click', (e) => {
-            // おみくじ紙自体（.omikuji-paper-design）がクリックされた場合は閉じないようにする
             // オーバーレイの黒い部分がクリックされたら閉じる
             if (e.target === omikujiResultDiv) {
                 closeOmikujiResult();
             }
         });
 
-        // 紙をクリックした際も閉じるようにする場合は以下も追加
+        // 紙をクリックした際も閉じる
         omikujiPaper.addEventListener('click', closeOmikujiResult);
     }
-    // ★★★ 追加終了 ★★★
+    // ★★★ 終了 ★★★
 };

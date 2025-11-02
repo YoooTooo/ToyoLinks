@@ -159,16 +159,16 @@ function showResult(grade) {
     localStorage.setItem('omikujiResult', JSON.stringify(resultData));
     localStorage.setItem('lastDrawDate', new Date().toDateString());
 
-    // ★★★ 修正箇所: 新しいフィールドの反映 ★★★
+    // ★★★ 新しいフィールドの反映 (変更なし) ★★★
     document.getElementById('result-omikuji').textContent = resultData.omikuji;
-    document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi; // 追加
-    document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning; // 追加
+    document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi;
+    document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning;
     document.getElementById('result-kanji').textContent = resultData.kanji;
     document.getElementById('result-yomi').textContent = resultData.yomi;
-    document.getElementById('result-meaning').textContent = resultData.meaning; // 意味も表示させる前提で追加
+    document.getElementById('result-meaning').textContent = resultData.meaning;
     document.getElementById('result-jp').textContent = resultData.jp;
     document.getElementById('result-en').textContent = resultData.en;
-    // ★★★ 修正箇所終了 ★★★
+    // ★★★ 終了 ★★★
 
 
     omikujiResultDiv.style.display = 'flex';
@@ -199,30 +199,32 @@ function omikujiAction(boxElement) {
 }
 
 window.restoreOmikujiStateAndPosition = function () {
-    // おみくじ結果の復元とアマテラスの位置調整
-    const isOmikujiFinished = checkOmikujiStatus();
 
-    // ★修正: 終了していない場合は結果表示コンテナを非表示にしておく (画面が暗くなる問題対策)
-    if (!isOmikujiFinished) {
+    // ★★★ 修正: 確実に非表示にリセットする ★★★
+    if (omikujiResultDiv) {
         omikujiResultDiv.style.display = 'none';
     }
-    // ★修正終了
+    // ★★★ 修正終了 ★★★
+
+    // おみくじ結果の復元とアマテラスの位置調整
+    const isOmikujiFinished = checkOmikujiStatus();
 
     if (isOmikujiFinished) {
         const savedResult = localStorage.getItem('omikujiResult');
         if (savedResult) {
             const resultData = JSON.parse(savedResult);
-            // ★★★ 修正箇所: 新しいフィールドの復元 ★★★
+            // ★★★ 修正箇所: 新しいフィールドの復元 (変更なし) ★★★
             document.getElementById('result-omikuji').textContent = resultData.omikuji;
-            document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi; // 復元
-            document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning; // 復元
+            document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi;
+            document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning;
             document.getElementById('result-kanji').textContent = resultData.kanji;
             document.getElementById('result-yomi').textContent = resultData.yomi;
-            document.getElementById('result-meaning').textContent = resultData.meaning; // 復元
+            document.getElementById('result-meaning').textContent = resultData.meaning;
             document.getElementById('result-jp').textContent = resultData.jp;
             document.getElementById('result-en').textContent = resultData.en;
             // ★★★ 修正箇所終了 ★★★
 
+            // 復元が必要な場合はここで表示する
             omikujiResultDiv.style.display = 'flex';
             omikujiPaper.classList.add('revealed');
         }
@@ -250,7 +252,7 @@ window.setupInteractiveElements = function () {
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
-        // ★★★ 修正箇所: タッチイベントロジックの改善 ★★★
+        // ★★★ タッチイベントロジック (変更なし) ★★★
         let touchStartTime = 0;
         const TOUCH_CLICK_THRESHOLD = 200; // 200ms以内に指を離したらクリックと見なす
 

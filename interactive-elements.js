@@ -1,5 +1,5 @@
 // =========================================================
-// interactive-elements.js: ホバーロードとおみくじロジック
+// reactive-elements.js: ホバーロードとおみくじロジック
 // =========================================================
 
 // グローバルな変数を window オブジェクトから取得 (script.jsで定義済み)
@@ -24,19 +24,19 @@ function decodeBase64(encoded) {
         for (let i = 0; i < bytes.length; i++) {
             charCode[i] = bytes.charCodeAt(i);
         }
-        if (typeof OMIIKUJI_DATA_RAW === 'undefined') {
-            console.error("omikuji_data.js not loaded.");
-        }
+        // グローバル変数 OMIIKUJI_DATA_RAW のチェックは不要
         return JSON.parse(new TextDecoder().decode(charCode));
     } catch (e) {
         console.error("Base64 Decode Error:", e);
-        return { omikuji: '???', kanji: '??', yomi: 'よみ', jp: 'データエラーが発生しました', en: 'Data error occurred' };
+        // エラー時のデータに新しいフィールドを追加
+        return { omikuji: '???', kanji: '??', yomi: 'よみ', omikujiyomi: 'error', omikujimeaning: 'Data Error', meaning: 'error', jp: 'データエラーが発生しました', en: 'Data error occurred' };
     }
 }
 
 // =======================
-// ホバーロードロジック
+// ホバーロードロジック (変更なし)
 // =======================
+// ... (startHover, stopHover, linkAction などの関数は変更なし) ...
 
 function createIndicator() {
     const indicator = document.createElement('div');
@@ -59,6 +59,9 @@ function startHover(e, actionCallback) {
 
     targetElement.classList.add('hovering');
 
+    // loading-indicatorの表示ロジックはCSSで行う前提で、ここでは省略
+    // もしJSで制御が必要なら、ここに実装します。
+
     hoverTimer = setTimeout(() => {
         if (window.isSelecting) {
             actionCallback(targetElement);
@@ -73,6 +76,8 @@ function stopHover(targetElement) {
     window.isSelecting = false;
     const indicator = targetElement.querySelector('.loading-indicator');
     if (indicator) {
+        // スタイル変更をCSSで行う場合は、このJSコードは不要な場合があります。
+        //ここでは元コードのロジックを維持します。
         indicator.style.transition = 'none';
         indicator.style.width = '0';
         indicator.style.opacity = '0';
@@ -140,6 +145,7 @@ function drawOmikuji() {
 }
 
 function showResult(grade) {
+    // OMIIKUJI_DATA_RAWは omikuji_data.js でグローバル変数として定義されている前提
     const kanjiArray = OMIIKUJI_DATA_RAW[grade];
     const randomIndex = Math.floor(Math.random() * kanjiArray.length);
     const encodedData = kanjiArray[randomIndex];
@@ -149,11 +155,17 @@ function showResult(grade) {
     localStorage.setItem('omikujiResult', JSON.stringify(resultData));
     localStorage.setItem('lastDrawDate', new Date().toDateString());
 
+    // ★★★ 修正箇所: 新しいフィールドの反映 ★★★
     document.getElementById('result-omikuji').textContent = resultData.omikuji;
+    document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi; // 追加
+    document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning; // 追加
     document.getElementById('result-kanji').textContent = resultData.kanji;
     document.getElementById('result-yomi').textContent = resultData.yomi;
+    document.getElementById('result-meaning').textContent = resultData.meaning; // 意味も表示させる前提で追加
     document.getElementById('result-jp').textContent = resultData.jp;
     document.getElementById('result-en').textContent = resultData.en;
+    // ★★★ 修正箇所終了 ★★★
+
 
     omikujiResultDiv.style.display = 'flex';
     setTimeout(() => {
@@ -190,11 +202,16 @@ window.restoreOmikujiStateAndPosition = function () {
         const savedResult = localStorage.getItem('omikujiResult');
         if (savedResult) {
             const resultData = JSON.parse(savedResult);
+            // ★★★ 修正箇所: 新しいフィールドの復元 ★★★
             document.getElementById('result-omikuji').textContent = resultData.omikuji;
+            document.getElementById('result-omikujiyomi').textContent = resultData.omikujiyomi; // 復元
+            document.getElementById('result-omikujimeaning').textContent = resultData.omikujimeaning; // 復元
             document.getElementById('result-kanji').textContent = resultData.kanji;
             document.getElementById('result-yomi').textContent = resultData.yomi;
+            document.getElementById('result-meaning').textContent = resultData.meaning; // 復元
             document.getElementById('result-jp').textContent = resultData.jp;
             document.getElementById('result-en').textContent = resultData.en;
+            // ★★★ 修正箇所終了 ★★★
 
             omikujiResultDiv.style.display = 'flex';
             omikujiPaper.classList.add('revealed');
@@ -208,7 +225,7 @@ window.restoreOmikujiStateAndPosition = function () {
     }
 }
 
-// メインのセットアップ関数 (script.jsから呼び出される)
+// メインのセットアップ関数 (変更なし)
 window.setupInteractiveElements = function () {
     const selectableElements = [...links, omikujiBox];
     selectableElements.forEach(el => {

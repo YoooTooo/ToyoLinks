@@ -22,29 +22,49 @@
         <img id="amaterasu-char" src="assets/amaterasu.svg" alt="アマテラス" class="amaterasu">
 
         <div class="omikuji-area">
-            <p class="omikuji-message" id="omikuji-message">
-                タップするとおみくじが引けます
+            <p id="omikuji-reset-message" class="reset-message">
+                本日のおみくじは終了しました。リセットは正午（12時）です。<br>
+                <span class="en-message">Today's omikuji draw is complete. It resets at noon (12:00 PM JST).</span>
             </p>
             <img src="assets/omikuji-box.svg" alt="おみくじ箱" class="omikuji-box" id="omikuji-box">
         </div>
 
-        <div class="omikuji-result" id="omikuji-result" style="display: none;">
-            <div class="paper-container">
-                <div class="omikuji-paper">
-                    <div class="result-omikuji" id="result-omikuji"></div>
-                    <div class="result-kanji-section">
-                        <div class="result-kanji" id="result-kanji"></div>
-                        <div class="result-yomi" id="result-yomi"></div>
-                    </div>
-                    <div class="result-explanation">
-                        <p class="jp-text" id="result-jp"></p>
-                        <p class="en-text" id="result-en"></p>
-                    </div>
+        <div id="omikuji-result" class="omikuji-result">
+            <div id="omikuji-paper" class="omikuji-paper">
+                <div class="omikuji-header">
+                    <h2 id="result-omikuji" class="result-grade">???</h2>
+                    <p class="omikuji-details">
+                        (<span id="result-omikujiyomi">???</span> | <span id="result-omikujimeaning">???</span>)
+                    </p>
                 </div>
+
+                <div class="kanji-info">
+                    <div class="kanji-info-main">
+                        <p id="result-kanji" class="result-kanji">??</p>
+                        <p class="kanji-readings">
+                            読み: <span id="result-yomi">???</span>
+                        </p>
+                        <p class="kanji-meaning">
+                            意味: <span id="result-meaning">???</span>
+                        </p>
+                    </div>
+
+                    <hr>
+
+                    <p class="result-description-jp">
+                        <span id="result-jp">データエラーが発生しました。</span>
+                    </p>
+
+                    <p class="result-description-en">
+                        <span id="result-en">Data error occurred.</span>
+                    </p>
+                </div>
+
+                <p id="omikuji-reset-message" class="reset-message">
+                    本日のおみくじは終了しました。リセットは正午（12時）です。<br>
+                    <span class="en-message">Today's omikuji draw is complete. It resets at noon (12:00 PM JST).</span>
+                </p>
             </div>
-            <p class="omikuji-reset-message" id="omikuji-reset-message" style="display: none;">
-                また明日引に来てね<br>Come back tomorrow!
-            </p>
         </div>
 
         <div class="link-area">

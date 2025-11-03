@@ -339,17 +339,18 @@ window.setupInteractiveElements = function () {
         }
     });
 
-    // ★★★ おみくじ結果オーバーレイを閉じるためのイベントリスナー (変更なし) ★★★
+    // ★★★ 修正箇所: おみくじ結果オーバーレイを閉じるためのイベントリスナー ★★★
     if (omikujiResultDiv) {
         omikujiResultDiv.addEventListener('click', (e) => {
+            // おみくじ紙自体（.omikuji-paper-design）がクリックされた場合は閉じないようにする
             // オーバーレイの黒い部分がクリックされたら閉じる
             if (e.target === omikujiResultDiv) {
                 closeOmikujiResult();
             }
         });
 
-        // 紙をクリックした際も閉じる
-        omikujiPaper.addEventListener('click', closeOmikujiResult);
+        // ★削除: おみくじ紙自体に設定されていたイベントリスナーを削除します。
+        // omikujiPaper.addEventListener('click', closeOmikujiResult); 
     }
-    // ★★★ 終了 ★★★
+    // ★★★ 修正箇所終了 ★★★
 };

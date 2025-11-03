@@ -6,6 +6,13 @@
 window.isSelecting = false;
 let hoverTimer = null;
 
+// ★★★ 修正箇所: 新しいフラグを導入 ★★★
+window.isOmikujiOpen = false; // おみくじ結果が表示されているか
+let closeGuardTimer = null;   // 連続タップによる誤動作を防ぐためのタイマー
+const CLOSE_GUARD_TIME = 500; // 500ms は閉じる操作を無視する
+// ★★★ 修正箇所終了 ★★★
+
+
 // omikuji_data.jsが先に読み込まれている前提
 const PROBABILITY_TABLE = [
     { grade: 'DAIKICHI', prob: 10 },
@@ -181,25 +188,43 @@ function showResult(grade) {
     omikujiResultDiv.style.display = 'flex';
     setTimeout(() => {
         omikujiPaper.classList.add('revealed');
+
+        // ★★★ 修正箇所: アニメーション後にフラグを立て、閉じる操作を受け付ける ★★★
+        window.isOmikujiOpen = true;
+        clearTimeout(closeGuardTimer); // 念のため既存タイマーをクリア
+        // ★★★ 修正箇所終了 ★★★
+
     }, 1000);
 }
 
-// ★★★ おみくじ結果を閉じる関数 (変更なし) ★★★
+// ★★★ おみくじ結果を閉じる関数 (ガードロジックを追加) ★★★
 function closeOmikujiResult() {
+    // ★★★ 修正箇所: フラグを確認し、閉じられる状態かチェック ★★★
+    if (!window.isOmikujiOpen) {
+        // まだ開いていない、またはガード期間中のため無視
+        return;
+    }
+    window.isOmikujiOpen = false; // 閉じるアニメーション開始と同時にフラグを倒す
+    // ★★★ 修正箇所終了 ★★★
+
     omikujiPaper.classList.remove('revealed');
+
     // アニメーションが終わってからオーバーレイを閉じる
     setTimeout(() => {
         omikujiResultDiv.style.display = 'none';
     }, 1500); // CSSの transition時間 (1.5s) に合わせる
 }
-// ★★★ 終了 ★★★
+// ★★★ 修正箇所終了 ★★★
 
 
 function omikujiAction(boxElement) {
 
-    // ★★★ 修正箇所: おみくじ結果が表示中の場合は、タップを無視して競合を防ぐ ★★★
-    if (omikujiResultDiv && omikujiResultDiv.style.display === 'flex') {
+    // ★★★ 修正箇所: おみくじ結果が表示中（かつ閉じる準備ができている）の場合は、タップを無視して競合を防ぐ ★★★
+    if (omikujiResultDiv && omikujiResultDiv.style.display === 'flex' && window.isOmikujiOpen) {
         // 結果表示中に omikujiArea が再度タップされた場合は何もしない
+        return;
+    } else if (omikujiResultDiv && omikujiResultDiv.style.display === 'flex' && !window.isOmikujiOpen) {
+        // 結果表示中だがまだアニメーション中の場合も何もしない
         return;
     }
     // ★★★ 修正箇所終了 ★★★
@@ -210,8 +235,17 @@ function omikujiAction(boxElement) {
         if (savedResult) {
             // 既に結果が引かれている場合は、復元ロジックを利用して表示
             restoreOmikujiStateAndPosition();
+
             omikujiResultDiv.style.display = 'flex';
             omikujiPaper.classList.add('revealed');
+
+            // ★★★ 修正箇所: 再表示時もフラグを立てる ★★★
+            clearTimeout(closeGuardTimer);
+            // アニメーション時間後にフラグを立てる
+            closeGuardTimer = setTimeout(() => {
+                window.isOmikujiOpen = true;
+            }, CLOSE_GUARD_TIME);
+            // ★★★ 修正箇所終了 ★★★
         }
         return;
     }
@@ -219,6 +253,10 @@ function omikujiAction(boxElement) {
     omikujiBox.classList.add('shaking');
     omikujiBox.style.cursor = 'default';
     omikujiMessage.textContent = '神様が結果を選んでいます...';
+
+    // ★★★ 修正箇所: 新規描画時は一旦フラグを倒しておく ★★★
+    window.isOmikujiOpen = false;
+    // ★★★ 修正箇所終了 ★★★
 
     setTimeout(() => {
         omikujiBox.classList.remove('shaking');
@@ -239,6 +277,9 @@ window.restoreOmikujiStateAndPosition = function () {
     // 確実に非表示にリセットする (変更なし)
     if (omikujiResultDiv) {
         omikujiResultDiv.style.display = 'none';
+        // ★★★ 修正箇所: 初期状態では閉じていると設定 ★★★
+        window.isOmikujiOpen = false;
+        // ★★★ 修正箇所終了 ★★★
     }
 
     // おみくじ結果の復元とアマテラスの位置調整
@@ -258,7 +299,6 @@ window.restoreOmikujiStateAndPosition = function () {
             document.getElementById('result-jp').textContent = resultData.jp;
             document.getElementById('result-en').textContent = resultData.en;
             // ★★★ 修正箇所終了 ★★★
-
         }
 
         const boxRect = omikujiBox.getBoundingClientRect();
@@ -280,18 +320,17 @@ window.setupInteractiveElements = function () {
         const isOmikuji = el.closest('.omikuji-area');
         const actionCallback = isOmikuji ? omikujiAction : linkAction;
 
-        // マウスイベント
+        // マウスイベント (変更なし)
         el.addEventListener('mouseenter', (e) => startHover(e, actionCallback));
         el.addEventListener('mouseleave', (e) => stopHover(e.currentTarget));
 
         // ★★★ タッチイベントロジック (変更なし) ★★★
         let touchStartTime = 0;
-        const TOUCH_CLICK_THRESHOLD = 200; // 200ms以内に指を離したらクリックと見なす
+        const TOUCH_CLICK_THRESHOLD = 200;
 
         el.addEventListener('touchstart', (e) => {
             touchStartTime = Date.now();
             clearTimeout(hoverTimer);
-            // 長押しを検知するためのホバータイマーを設定
             hoverTimer = setTimeout(() => startHover(e, actionCallback), HOVER_LOAD_TIME);
         }, { passive: true });
 
@@ -346,7 +385,7 @@ window.setupInteractiveElements = function () {
             }
         });
 
-        // 2. おみくじ紙自体がクリック/タップされたら閉じる機能を復活
+        // 2. おみくじ紙自体がクリック/タップされたら閉じる
         omikujiPaper.addEventListener('click', closeOmikujiResult);
     }
     // ★★★ 修正箇所終了 ★★★

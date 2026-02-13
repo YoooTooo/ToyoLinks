@@ -671,6 +671,19 @@ body {
 
 .disabled-link {
     pointer-events: none;
-    /* クリック不可 */
-    cursor: default;
+    cursor: not-allowed;
+    opacity: 0.5;
+    filter: grayscale(70%);
+}
+
+/* Coming Soon ラベル */
+.coming-soon::after {
+    content: "Coming Soon";
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7em;
+    color: var(--main-red);
+    font-weight: bold;
 }

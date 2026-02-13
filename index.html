@@ -82,32 +82,48 @@
         <div class="link-area">
             <div> ↓リンクはまだです。開発中です！！ごめんね</div>
             <div> ↓The link isn’t ready yet — it’s still in development!! Sorry about that.</div>
-            <a href="YOUR_YOUTUBE_URL" class="torii-link" data-platform="youtube">
-                <img src="assets/torii-youtube.svg" alt="YouTube" class="torii-img">
-            </a>
 
-            <a href="YOUR_TIKTOK_URL" class="torii-link" data-platform="tiktok">
-                <img src="assets/torii-tiktok.svg" alt="TikTok" class="torii-img">
-            </a>
+            <!-- ① Patreon：一番上 + 右に吹き出し -->
+            <div class="top-link-row">
+                <a href="https://www.patreon.com/YoooToooSoooN" class="torii-link" data-platform="paid">
+                    <img src="assets/torii-patreon.svg" alt="Patreon" class="torii-img">
+                </a>
 
-            <a href="YOUR_INSTAGRAM_URL" class="torii-link" data-platform="instagram">
-                <img src="assets/torii-instagram.svg" alt="Instagram" class="torii-img">
-            </a>
+                <div class="speech-bubble speech-bubble--right">
+                    <p class="bubble-title">Let’s study together!</p>
+                    <p class="bubble-text">Short lessons + notes inside.</p>
+                    <p class="bubble-sub">Follow this account too 👇</p>
+                </div>
+            </div>
 
-            <a href="YOUR_PATREON_URL" class="torii-link" data-platform="paid">
-                <img src="assets/torii-patreon.svg" alt="Patreon" class="torii-img">
-            </a>
+            <!-- ② YouTube / Instagram / TikTok：横並び -->
+            <div class="social-row">
+                <a href="YOUR_YOUTUBE_URL" class="torii-link" data-platform="youtube">
+                    <img src="assets/torii-youtube.svg" alt="YouTube" class="torii-img">
+                </a>
+
+                <a href="https://www.instagram.com/japanese_otaku_teacher_toyo/" class="torii-link"
+                    data-platform="instagram">
+                    <img src="assets/torii-instagram.svg" alt="Instagram" class="torii-img">
+                </a>
+
+                <a href="YOUR_TIKTOK_URL" class="torii-link" data-platform="tiktok">
+                    <img src="assets/torii-tiktok.svg" alt="TikTok" class="torii-img">
+                </a>
+            </div>
+
+            <!-- ③ 下の吹き出し（3つの名前を入れる） -->
+            <div class="social-bubble-wrap">
+                <div class="speech-bubble speech-bubble--down">
+                    <p class="bubble-title">YouTube / Instagram / TikTok</p>
+                    <p class="bubble-text">New posts & mini lessons are here.</p>
+                </div>
+            </div>
         </div>
 
-        <p class="caption">
-            日常で使える生きた日本語を学ぼう
-        </p>
-
-    </div>
-
-    <script src="interactive-elements.js"></script>
-    <script src="amaterasu-movement.js"></script>
-    <script src="script.js"></script>
+        <script src="interactive-elements.js"></script>
+        <script src="amaterasu-movement.js"></script>
+        <script src="script.js"></script>
 </body>
 
 </html>

@@ -97,12 +97,126 @@ body {
 .link-area {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    /* ★修正: portal-container の margin-top 調整に合わせて再度調整 */
+    gap: 18px;
     margin-top: 50px;
     align-items: center;
     padding: 20px 0;
     width: 100%;
+}
+
+/* Patreon：鳥居 + 右吹き出し */
+.top-link-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* YouTube / Instagram / TikTok 横並び */
+.social-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    /* 画面が狭いとき折り返し */
+    width: 100%;
+}
+
+/* 下の吹き出しを中央に置く */
+.social-bubble-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* ===== 吹き出し（CSSのみ） ===== */
+.speech-bubble {
+    position: relative;
+    max-width: 360px;
+    padding: 14px 16px;
+    border-radius: 16px;
+
+    /* 和紙寄せ：あなたの変数を活かす */
+    background: rgba(255, 250, 240, 0.92);
+    /* --omikuji-paper 系 */
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+
+    line-height: 1.35;
+    text-align: left;
+}
+
+/* バブル内テキスト */
+.speech-bubble .bubble-title {
+    margin: 0 0 6px;
+    font-weight: 800;
+    color: var(--text-color);
+}
+
+.speech-bubble .bubble-text,
+.speech-bubble .bubble-sub {
+    margin: 0;
+    color: #444;
+}
+
+.speech-bubble .bubble-sub {
+    margin-top: 8px;
+    font-weight: 700;
+    color: var(--main-red);
+}
+
+/* 右向き尻尾（Patreonの右吹き出し） */
+.speech-bubble--right::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 22px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 12px solid rgba(255, 250, 240, 0.92);
+}
+
+.speech-bubble--right::before {
+    content: "";
+    position: absolute;
+    left: -13px;
+    top: 21px;
+    width: 0;
+    height: 0;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    border-right: 14px solid rgba(0, 0, 0, 0.15);
+}
+
+/* 下向き尻尾（下段の吹き出し） */
+.speech-bubble--down::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid rgba(255, 250, 240, 0.92);
+}
+
+.speech-bubble--down::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -13px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-top: 14px solid rgba(0, 0, 0, 0.15);
 }
 
 /* 鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに限定 */
@@ -515,4 +629,42 @@ body {
 .loading-indicator {
     background-color: var(--omikuji-main-kanji);
     /* おみくじの色と合わせる */
+}
+
+
+/* ===== スマホ最適化 ===== */
+@media (max-width: 640px) {
+    .top-link-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Patreon吹き出し：スマホでは「右」より「下」っぽく */
+    .speech-bubble--right::after {
+        left: 50%;
+        top: auto;
+        bottom: -10px;
+        transform: translateX(-50%);
+        border-right: none;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 12px solid rgba(255, 250, 240, 0.92);
+        border-bottom: none;
+    }
+
+    .speech-bubble--right::before {
+        left: 50%;
+        top: auto;
+        bottom: -13px;
+        transform: translateX(-50%);
+        border-right: none;
+        border-left: 13px solid transparent;
+        border-right: 13px solid transparent;
+        border-top: 14px solid rgba(0, 0, 0, 0.15);
+        border-bottom: none;
+    }
+
+    .speech-bubble {
+        text-align: center;
+    }
 }

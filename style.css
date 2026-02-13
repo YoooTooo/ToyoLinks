@@ -668,3 +668,9 @@ body {
         text-align: center;
     }
 }
+
+.disabled-link {
+    pointer-events: none;
+    /* クリック不可 */
+    cursor: default;
+}

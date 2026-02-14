@@ -74,7 +74,7 @@ body {
 
     text-align: center;
     position: relative;
-    padding-bottom: 550px;
+    padding-bottom: 150px;
     /* ★修正: ヘッダーアイコンと重ならないように上部マージンを調整 */
     margin-top: 50px;
 }

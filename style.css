@@ -1,689 +1,1076 @@
 :root {
+
     /* 色の変数定義 (和風カラー) */
+
     --main-red: #cc3333;
+
     /* 鳥居の色 */
+
     --accent-gold: #ffcc00;
+
     /* アクセントカラー */
+
     --text-color: #333333;
 
     /* ★追加: おみくじデザイン用カラー変数 ★ */
+
     --omikuji-paper: #fffaf0;
+
     /* 和紙のようなアイボリー色 */
+
     --omikuji-border: #8B4513;
+
     /* 茶色い枠線 */
+
     --omikuji-accent: #a0522d;
+
     /* 運勢テキスト色 */
+
     --omikuji-main-kanji: #d2691e;
+
     /* 漢字テキスト色 */
+
 }
 
 body {
+
     font-family: 'Arial', sans-serif;
 
     /* 背景設定: assets/background.svg のパスを適用 */
+
     background-image: url('assets/background.svg');
+
     background-size: cover;
+
     background-repeat: no-repeat;
+
     background-attachment: fixed;
+
     background-position: center center;
 
     margin: 0;
+
     /* ★修正: ヘッダーアイコンのために上部のパディングを調整 */
+
     padding: 80px 20px 20px;
 
     display: flex;
+
     justify-content: center;
+
     /* コンテナを水平中央に配置 */
+
     align-items: center;
+
     min-height: 100vh;
+
     box-sizing: border-box;
+
     width: 100vw;
+
     /* 画面全体を使用 */
+
 }
 
 /* ★追加: ヘッダーアイコン用のコンテナ ★ */
+
 .header-icon-container {
+
     position: absolute;
+
     /* 画面に対して絶対位置 */
+
     top: 20px;
+
     /* 上からの距離 */
+
     left: 50%;
+
     /* 中央寄せの基準 */
+
     transform: translateX(-50%);
+
     /* 中央寄せ */
+
     z-index: 20;
+
     /* 他の要素より手前に表示 */
+
     padding: 10px;
+
     /* 少し余白 */
+
 }
 
 /* ★追加: サイトヘッダーアイコンのスタイル ★ */
+
 .site-header-icon {
+
     width: 100px;
+
     /* アイコンのサイズを調整 */
+
     height: auto;
+
     display: block;
+
     background-color: transparent;
+
     /* SVGの透過対策 */
+
 }
 
 .portal-container {
+
     width: 100%;
+
     /* 最大幅を1000pxに設定（実質的に画面全体を使用）*/
+
     max-width: 1000px;
 
     text-align: center;
+
     position: relative;
+
     padding-bottom: 180px;
+
     /* ★修正: ヘッダーアイコンと重ならないように上部マージンを調整 */
+
     margin-top: 50px;
+
 }
 
 /* アマテラス画像の初期設定（JSが位置を制御するための最小限のCSS） */
+
 .amaterasu {
+
     width: 120px;
+
     height: auto;
+
     position: absolute;
+
     bottom: 20px;
+
     left: 0;
 
     background-color: transparent;
 
     transition: opacity 0.5s ease-out, transform 0.4s ease-out;
+
     z-index: 10;
+
 }
 
 /* リンクエリアのレイアウト */
-.link-area {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin-top: 50px;
-    align-items: center;
-    padding: 20px 0;
-    width: 100%;
-}
 
-/* Patreon：鳥居 + 右吹き出し */
-.top-link-row {
+.link-area {
+
     display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    margin-top: 50px;
+
     align-items: center;
-    gap: 16px;
-    justify-content: center;
+
+    padding: 20px 0;
+
     width: 100%;
+
 }
 
 /* YouTube / Instagram / TikTok 横並び */
+
 .social-row {
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     gap: 18px;
+
     flex-wrap: wrap;
+
     /* 画面が狭いとき折り返し */
+
     width: 100%;
+
 }
 
 /* 下の吹き出しを中央に置く */
+
 .social-bubble-wrap {
+
     display: flex;
+
     justify-content: center;
+
     width: 100%;
+
 }
 
 /* ===== 吹き出し（CSSのみ） ===== */
+
 .speech-bubble {
+
     position: relative;
+
     max-width: 360px;
+
     padding: 14px 16px;
+
     border-radius: 16px;
 
     /* 和紙寄せ：あなたの変数を活かす */
+
     background: rgba(255, 250, 240, 0.92);
+
     /* --omikuji-paper 系 */
+
     border: 2px solid rgba(0, 0, 0, 0.15);
+
     backdrop-filter: blur(4px);
 
     line-height: 1.35;
+
     text-align: left;
+
 }
 
 /* バブル内テキスト */
+
 .speech-bubble .bubble-title {
+
     margin: 0 0 6px;
+
     font-weight: 800;
+
     color: var(--text-color);
+
 }
 
 .speech-bubble .bubble-text,
+
 .speech-bubble .bubble-sub {
+
     margin: 0;
+
     color: #444;
+
 }
 
 .speech-bubble .bubble-sub {
+
     margin-top: 8px;
+
     font-weight: 700;
+
     color: var(--main-red);
-}
 
-/* 右向き尻尾（Patreonの右吹き出し） */
-.speech-bubble--right::after {
-    content: "";
-    position: absolute;
-    left: -10px;
-    top: 22px;
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-right: 12px solid rgba(255, 250, 240, 0.92);
-}
-
-.speech-bubble--right::before {
-    content: "";
-    position: absolute;
-    left: -13px;
-    top: 21px;
-    width: 0;
-    height: 0;
-    border-top: 11px solid transparent;
-    border-bottom: 11px solid transparent;
-    border-right: 14px solid rgba(0, 0, 0, 0.15);
 }
 
 /* 下向き尻尾（下段の吹き出し） */
+
 .speech-bubble--down::after {
+
     content: "";
+
     position: absolute;
+
     left: 50%;
+
     bottom: -10px;
+
     transform: translateX(-50%);
+
     width: 0;
+
     height: 0;
+
     border-left: 12px solid transparent;
+
     border-right: 12px solid transparent;
+
     border-top: 12px solid rgba(255, 250, 240, 0.92);
+
 }
 
 .speech-bubble--down::before {
+
     content: "";
+
     position: absolute;
+
     left: 50%;
+
     bottom: -13px;
+
     transform: translateX(-50%);
+
     width: 0;
+
     height: 0;
+
     border-left: 13px solid transparent;
+
     border-right: 13px solid transparent;
+
     border-top: 14px solid rgba(0, 0, 0, 0.15);
+
 }
 
 /* 鳥居リンク（<a>タグ）のスタイル: クリック領域を画像サイズに限定 */
+
 .torii-link {
+
     display: block;
+
     width: 80px;
 
     text-decoration: none;
+
     background-color: transparent;
+
     border: none;
+
     padding: 0;
+
     box-shadow: none;
 
     transition: transform 0.2s;
+
     position: relative;
+
     overflow: hidden;
+
     text-align: center;
+
     z-index: 15;
+
 }
 
 .torii-link:hover {
+
     transform: translateY(-2px);
+
     background-color: transparent;
+
 }
 
 /* 鳥居画像（<img>タグ）のスタイル */
+
 .torii-img {
+
     width: 80px;
+
     height: auto;
+
     margin: 0;
+
     background-color: transparent;
+
     z-index: 15;
+
 }
 
 .caption {
+
     margin-top: 30px;
+
     color: var(--main-red);
+
     font-size: 1.1em;
+
     font-weight: bold;
+
 }
 
 /* style.css の末尾に追記 */
 
 /* --- おみくじエリアのスタイル --- */
+
 .omikuji-area {
+
     /* interactive-element の基底スタイルを継承 */
+
     margin-top: 40px;
+
     padding: 20px;
+
     text-align: center;
 
     /* 🚨 修正: z-indexを有効化するために position を追加 */
+
     position: relative;
 
     /* z-index は interactive-element で設定済みですが、明示的に設定するならここ */
+
     z-index: 15;
+
 }
 
 .omikuji-message {
+
     color: var(--text-color);
+
     font-size: 1.2em;
+
     font-weight: bold;
+
     margin-bottom: 10px;
+
 }
 
 .omikuji-box {
+
     width: 150px;
+
     height: auto;
+
     transition: transform 0.3s ease-out;
+
     z-index: 15;
+
 }
 
 /* --- おみくじ箱の揺れアニメーション --- */
+
 @keyframes shake {
 
     0%,
+
     100% {
+
         transform: translate(1px, 1px) rotate(0deg);
+
     }
 
     10% {
+
         transform: translate(-1px, -2px) rotate(-1deg);
+
     }
 
     20% {
+
         transform: translate(-3px, 0px) rotate(1deg);
+
     }
 
     30% {
+
         transform: translate(3px, 2px) rotate(0deg);
+
     }
 
     40% {
+
         transform: translate(1px, -1px) rotate(1deg);
+
     }
 
     50% {
+
         transform: translate(-1px, 2px) rotate(-1deg);
+
     }
 
     60% {
+
         transform: translate(-3px, 1px) rotate(0deg);
+
     }
 
     70% {
+
         transform: translate(3px, 1px) rotate(-1deg);
+
     }
 
     80% {
+
         transform: translate(-1px, -1px) rotate(1deg);
+
     }
 
     90% {
+
         transform: translate(1px, 2px) rotate(0deg);
+
     }
+
 }
 
 .shaking {
+
     animation: shake 0.1s infinite;
+
 }
 
-
 /* ======================================================= */
+
 /* ★★★ 古いおみくじ用紙のCSSを新しい縦長デザインで上書き/置き換え ★★★ */
+
 /* ======================================================= */
 
 /* --- 結果表示エリアのスタイル (上書き) --- */
+
 /* .omikuji-result は .omikuji-result-container に置き換えられるが、衝突を避けるためここでは変更しない */
+
 .omikuji-result {
+
     /* 以前のスタイルを保持 */
+
     text-align: center;
+
     margin-top: 30px;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
 }
 
 /* 古い .omikuji-reset-message は新しいスタイルで上書き */
+
 .omikuji-reset-message {
+
     color: var(--main-red);
+
     font-size: 1.1em;
+
     font-weight: bold;
+
     margin-top: 20px;
+
 }
 
 /* 古い .paper-container は使用しないため、ここでは残すのみ */
+
 .paper-container {
+
     perspective: 800px;
+
     width: 200px;
+
     height: 450px;
+
 }
 
 /* 古い .omikuji-paper は新しい .omikuji-paper-design で置き換えられるが、アニメーションは流用 */
+
 .omikuji-paper {
+
     /* アニメーション関連のスタイルは維持 */
+
     transform: translateY(-500px) rotateX(90deg) scale(0.5);
+
     opacity: 0;
+
     transition: all 1.5s ease-out;
+
 }
 
 /* 登場アニメーション後の状態 */
+
 .omikuji-paper.revealed {
+
     transform: translateY(0) rotateX(0deg) scale(1);
+
     opacity: 1;
+
 }
 
 /* ======================================================= */
 
-
 /* --- ホバーロードインジケータのスタイル --- */
+
 .loading-indicator {
+
     position: absolute;
+
     bottom: -15px;
+
     /* 要素の下に配置 */
+
     left: 50%;
+
     transform: translateX(-50%);
+
     width: 0;
+
     height: 5px;
+
     background-color: var(--main-red);
+
     transition: width 1s linear;
+
     /* 1秒で満タンになるアニメーション */
+
     border-radius: 2px;
+
     opacity: 0;
+
 }
 
 /* ホバー中の状態 */
+
 .hovering .loading-indicator {
+
     width: 100%;
+
     opacity: 1;
+
 }
 
 /* 鳥居、おみくじ箱にホバーインジケータを配置するための設定 */
+
 .torii-link,
+
 .omikuji-area {
+
     position: relative;
+
     /* 子要素の loading-indicator を配置 */
+
 }
 
 /* ドラッグ操作時のカーソル変更 */
+
 .portal-container {
+
     cursor: grab;
+
     /* 通常は掴むカーソル */
+
     user-select: none;
+
     /* テキスト選択を防ぐ */
+
 }
 
 .portal-container.dragging {
+
     cursor: grabbing;
+
     /* ドラッグ中は掴んでいるカーソル */
+
 }
 
 /* ======================================================= */
+
 /* ★★★ 追記: おみくじデザインの修正CSS (縦長、和風) ★★★ */
+
 /* ======================================================= */
 
 /* フォントのインポート (例: Google Fonts) */
+
 @import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap');
 
 /* --- おみくじ結果表示デザイン --- */
+
 .omikuji-result-container {
+
     position: fixed;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 100%;
+
     background-color: rgba(0, 0, 0, 0.7);
+
     /* 半透明のオーバーレイ */
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     z-index: 1000;
+
     /* ★修正: 初期状態で非表示にする (暗くなる問題対策) ★ */
+
     display: none;
+
 }
 
 .omikuji-paper-design {
+
     width: 300px;
+
     /* 縦長にするため幅を狭く */
+
     max-height: 80vh;
+
     /* 画面の高さに応じて調整 */
+
     background-color: var(--omikuji-paper);
+
     /* 和紙のようなアイボリー色 */
+
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><rect fill="%23fffaf0" width="10" height="10"/><path fill="%23f0ead6" d="M0 0h10v10H0zM2 2h6v6H2zM1 1h8v8H1z" opacity=".2"/></svg>');
+
     /* 和紙風のテクスチャ */
+
     border: 3px solid var(--omikuji-border);
+
     /* 茶色い枠線 */
+
     border-radius: 8px;
+
     padding: 20px;
+
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+
     text-align: center;
+
     display: flex;
+
     flex-direction: column;
+
     /* 縦並び */
+
     justify-content: space-between;
+
     /* 要素を上下に配置 */
+
     overflow-y: auto;
+
     /* 内容が長い場合はスクロール */
+
     /* アニメーションは .omikuji-paper クラスに任せる */
+
 }
 
 /* 登場アニメーション後の状態 (旧クラス名を流用) */
+
 .omikuji-paper.revealed {
+
     opacity: 1;
+
     transform: translateY(0) rotateX(0deg) scale(1);
+
     /* 旧アニメーションを適用 */
+
 }
 
 .omikuji-top-section {
+
     margin-bottom: 15px;
+
     border-bottom: 1px dashed var(--omikuji-accent);
+
     /* 点線で区切り */
+
     padding-bottom: 10px;
+
 }
 
 .omikuji-title {
+
     font-family: 'Hina Mincho', serif;
+
     /* 筆文字風フォント (仮) */
+
     font-size: 2.2em;
+
     color: var(--omikuji-border);
+
     margin-bottom: 5px;
+
     letter-spacing: 2px;
+
 }
 
 .omikuji-grade-text {
+
     font-family: 'Hina Mincho', serif;
+
     /* 筆文字風フォント */
+
     font-size: 3.5em;
+
     /* 大きく */
+
     color: var(--omikuji-accent);
+
     margin: 0;
+
     line-height: 1;
+
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+
 }
 
 .omikuji-grade-details {
+
     font-size: 0.9em;
+
     color: var(--text-color);
+
     margin-top: 5px;
+
 }
 
 .omikuji-kanji-section {
+
     display: flex;
+
     flex-direction: column;
+
     /* 縦並び */
+
     align-items: center;
+
     gap: 10px;
+
     /* 要素間のスペース */
+
     margin-bottom: 15px;
+
 }
 
 .kanji-display-area {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
 }
 
 .result-kanji-char {
+
     font-family: 'Hina Mincho', serif;
+
     /* 筆文字風フォント */
+
     font-size: 5em;
+
     /* 最も大きく */
+
     color: var(--omikuji-main-kanji);
+
     /* 鮮やかなオレンジブラウン */
+
     margin: 0;
+
     line-height: 1;
+
     text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.15);
+
 }
 
 .kanji-readings-meanings {
+
     font-size: 0.9em;
+
     color: var(--text-color);
+
     line-height: 1.4;
+
     text-align: center;
+
 }
 
 .seal-area {
+
     width: 60px;
+
     height: 60px;
+
     border: 2px solid var(--main-red);
+
     /* 赤い印鑑風の枠 */
+
     border-radius: 50%;
+
     /* 丸い印鑑 */
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     margin-top: 10px;
+
     /* 上部との間隔 */
+
 }
 
 .seal-text {
+
     font-family: 'Hina Mincho', serif;
+
     /* 和風フォント */
+
     font-size: 2.5em;
+
     color: var(--main-red);
+
     /* 赤色 */
+
     line-height: 1;
+
     transform: rotate(-10deg);
+
     /* 少し傾ける */
+
     opacity: 0.8;
+
 }
 
 .omikuji-divider {
+
     border: none;
+
     border-top: 1px solid var(--omikuji-border);
+
     /* ベージュ系の線 */
+
     margin: 15px 0;
+
 }
 
 .omikuji-description-section {
+
     text-align: left;
+
     font-size: 0.95em;
+
     color: var(--text-color);
+
     line-height: 1.6;
+
     margin-bottom: 15px;
+
     flex-grow: 1;
+
     /* スペースを埋める */
+
 }
 
 .result-description-jp,
+
 .result-description-en {
+
     margin-bottom: 10px;
+
 }
 
 .omikuji-reset-text {
+
     font-size: 0.85em;
+
     color: #888;
+
     margin-top: 20px;
+
     border-top: 1px dashed var(--omikuji-border);
+
     /* 点線で区切り */
+
     padding-top: 10px;
+
 }
 
 /* おみくじ箱のメッセージも日英対応 */
+
 .omikuji-message .en-message {
+
     display: block;
+
     /* 常に表示 */
+
     font-size: 0.8em;
+
     color: #666;
+
     margin-top: 5px;
+
 }
 
 /* 英語メッセージのスタイル */
+
 .en-message {
+
     font-size: 0.9em;
+
     color: #555;
+
     margin-top: 8px;
+
     /* 日本語との間に少しスペース */
+
 }
 
 /* ホバーインジケーターの色変更 */
-.loading-indicator {
-    background-color: var(--omikuji-main-kanji);
-    /* おみくじの色と合わせる */
-}
 
+.loading-indicator {
+
+    background-color: var(--omikuji-main-kanji);
+
+    /* おみくじの色と合わせる */
+
+}
 
 /* ===== スマホ最適化 ===== */
 @media (max-width: 640px) {
-    .top-link-row {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    /* Patreon吹き出し：スマホでは「右」より「下」っぽく */
-    .speech-bubble--right::after {
-        left: 50%;
-        top: auto;
-        bottom: -10px;
-        transform: translateX(-50%);
-        border-right: none;
-        border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
-        border-top: 12px solid rgba(255, 250, 240, 0.92);
-        border-bottom: none;
-    }
-
-    .speech-bubble--right::before {
-        left: 50%;
-        top: auto;
-        bottom: -13px;
-        transform: translateX(-50%);
-        border-right: none;
-        border-left: 13px solid transparent;
-        border-right: 13px solid transparent;
-        border-top: 14px solid rgba(0, 0, 0, 0.15);
-        border-bottom: none;
-    }
-
     .speech-bubble {
         text-align: center;
     }
 }
 
-.disabled-link {
+/* ======================================================= */
+/* Footer / Privacy Policy                                 */
+/* ======================================================= */
+
+.site-footer {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    padding: 8px 12px;
+    text-align: right;
     pointer-events: none;
-    cursor: not-allowed;
-    opacity: 0.5;
-    filter: grayscale(70%);
 }
 
-/* Coming Soon ラベル */
-.coming-soon::after {
-    content: "Coming Soon";
-    position: absolute;
-    bottom: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.7em;
-    color: var(--main-red);
-    font-weight: bold;
+.privacy-link {
+    pointer-events: auto;
+    display: inline-block;
+    font-size: 10px;
+    line-height: 1.2;
+    color: rgba(51, 51, 51, 0.48);
+    text-decoration: none;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.privacy-link:hover,
+.privacy-link:focus-visible {
+    color: rgba(51, 51, 51, 0.82);
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .site-footer {
+        padding: 6px 8px;
+    }
+
+    .privacy-link {
+        font-size: 9px;
+    }
 }
